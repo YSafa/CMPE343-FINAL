@@ -2,7 +2,7 @@ CREATE DATABASE  IF NOT EXISTS `greengrocerdb` /*!40100 DEFAULT CHARACTER SET ut
 USE `greengrocerdb`;
 -- MySQL dump 10.13  Distrib 8.0.44, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: greengrocerdb
+-- Host: localhost    Database: greengrocerdb
 -- ------------------------------------------------------
 -- Server version	8.0.44
 
@@ -114,4 +114,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-21 17:36:59
+-- Dump completed on 2025-12-27 22:43:34

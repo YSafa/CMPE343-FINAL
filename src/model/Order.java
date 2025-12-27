@@ -35,7 +35,7 @@ public class Order
     public String getProducts() { return products; }
     public int getUserId() { return userId; }
     public int getCarrierId() { return carrierId; }
-    public boolean geIisDelivered() { return isDelivered; }
+    public boolean getIsDelivered() { return isDelivered; }
     public double getTotalCost() { return totalCost; }
     // ... add other getters as needed
 }
