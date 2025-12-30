@@ -26,7 +26,16 @@ public class Product
     public int getId() { return id; }
     public String getName() { return name; }
     public String getType() { return type; }
-    public double getPrice() { return price; }
+    // Product.java sınıfının içinde
+    public double getPrice()
+    {
+        // Proje Kuralı: Stok, eşik değerine (threshold) eşit veya altındaysa fiyat 2 katına çıkar.
+        if (this.stock <= this.threshold) {
+            return this.price * 2;
+        }
+        // Stok yeterliyse normal fiyatı döndür.
+        return this.price;
+    }
     public double getStock() { return stock; }
     public String getImageLocation() { return imageLocation; }
     public double getThreshold() { return threshold; }
