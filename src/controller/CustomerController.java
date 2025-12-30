@@ -79,7 +79,7 @@ public class CustomerController implements Initializable
                         rs.getString("type"), // Enum comes as String
                         rs.getDouble("price"),
                         rs.getDouble("stock"),
-                        rs.getString("imagelocation"),
+                        rs.getBytes("image"),
                         rs.getDouble("threshold")
                 );
                 productList.add(product);
