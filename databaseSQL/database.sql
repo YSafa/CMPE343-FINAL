@@ -61,7 +61,7 @@ CREATE TABLE `productinfo` (
   `type` enum('fruit','vegetable') NOT NULL,
   `price` double NOT NULL,
   `stock` double NOT NULL,
-  `imagelocation` varchar(255) DEFAULT NULL,
+  `image` longblob,
   `threshold` double NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -114,4 +114,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-27 22:43:34
+-- Dump completed on 2025-12-30 19:11:56
