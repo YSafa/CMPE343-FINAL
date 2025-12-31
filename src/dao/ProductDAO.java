@@ -105,4 +105,33 @@ public class ProductDAO
             return false;
         }
     }
+    public boolean updateProduct(Product product) {
+        String sql = "UPDATE productinfo SET name=?, type=?, price=?, stock=?, image=?, threshold=? WHERE id=?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, product.getName());
+            stmt.setString(2, product.getType());
+            stmt.setDouble(3, product.getPrice());
+            stmt.setDouble(4, product.getStock());
+            stmt.setBytes(5, product.getImage()); // BLOB olarak resim [cite: 58]
+            stmt.setDouble(6, product.getThreshold());
+            stmt.setInt(7, product.getId());
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean deleteProduct(int id) {
+        String sql = "DELETE FROM productinfo WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

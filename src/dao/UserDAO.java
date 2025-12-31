@@ -42,4 +42,34 @@ public class UserDAO
             return stmt.executeUpdate() > 0;
         }
     }
+    public java.util.List<User> getUsersByRole(String role) {
+        java.util.List<User> users = new java.util.ArrayList<>();
+        String sql = "SELECT * FROM userinfo WHERE role = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, role);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                users.add(new User(
+                    rs.getInt("id"), rs.getString("username"),
+                    rs.getString("password"), rs.getString("role"),
+                    rs.getString("address")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
+    public boolean deleteUser(int id) {
+        String sql = "DELETE FROM userinfo WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

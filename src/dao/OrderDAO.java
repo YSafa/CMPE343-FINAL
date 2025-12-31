@@ -145,6 +145,22 @@ public class OrderDAO
         }
         return orders;
     }
-
+    public List<model.Order> getAllOrders() {
+        List<model.Order> orders = new ArrayList<>();
+        String sql = "SELECT * FROM orderinfo";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                orders.add(new model.Order(
+                    rs.getInt("id"), rs.getTimestamp("ordertime"),
+                    rs.getTimestamp("deliverytime"), rs.getString("products"),
+                    rs.getInt("user_id"), rs.getInt("carrier_id"),
+                    rs.getBoolean("isdelivered"), rs.getDouble("totalcost"), ""
+                ));
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return orders;
+    }
 
 }
