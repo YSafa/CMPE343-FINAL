@@ -10,7 +10,7 @@ public class Group29 extends Application {
     @Override
     public void start(Stage stage) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/resources/Login.fxml"));
 
             Scene scene = new Scene(loader.load());
             stage.setTitle("Group29 GreenGrocer");

@@ -51,13 +51,13 @@ public class LoginController {
 
                 switch (role) {
                     case "customer":
-                        loader = new FXMLLoader(getClass().getResource("/fxml/CustomerView.fxml"));
+                        loader = new FXMLLoader(getClass().getResource("/resources/CustomerView.fxml"));
                         break;
                     case "carrier":
-                        loader = new FXMLLoader(getClass().getResource("/fxml/CarrierView.fxml"));
+                        loader = new FXMLLoader(getClass().getResource("/resources/CarrierView.fxml"));
                         break;
                     case "owner":
-                        loader = new FXMLLoader(getClass().getResource("/fxml/OwnerView.fxml"));
+                        loader = new FXMLLoader(getClass().getResource("/resources/OwnerView.fxml"));
                         break;
                     default:
                         showAlert("Error", "Unknown role!");
