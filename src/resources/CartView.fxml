@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controller.CartController"
+            prefWidth="600" prefHeight="400">
+
+    <top>
+        <Label text="Your Shopping Cart"
+               style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 10;"
+               BorderPane.alignment="CENTER"/>
+    </top>
+
+    <center>
+        <TableView fx:id="cartTable">
+            <columns>
+                <TableColumn fx:id="nameColumn" text="Product"/>
+                <TableColumn fx:id="quantityColumn" text="Quantity (kg)"/>
+                <TableColumn fx:id="unitPriceColumn" text="Unit Price"/>
+                <TableColumn fx:id="totalPriceColumn" text="Total Price"/>
+            </columns>
+        </TableView>
+    </center>
+
+    <bottom>
+        <HBox spacing="20" alignment="CENTER" style="-fx-padding: 10;">
+            <Label fx:id="totalLabel" text="Total: ₺0.00"/>
+            <Button text="Remove Selected" onAction="#handleRemove"/>
+            <Button text="Close" onAction="#handleClose"/>
+        </HBox>
+    </bottom>
+
+
+</BorderPane>

@@ -20,6 +20,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ResourceBundle;
 
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
+
 
 /**
  * Controller for the Customer view.
@@ -181,8 +186,27 @@ public class CustomerController implements Initializable
      */
     @FXML
     private void handleViewCart() {
-        Alertutil.showInfoMessage("Opening cart view...");
+        try {
+            FXMLLoader loader =
+                    new FXMLLoader(getClass().getResource("/resources/CartView.fxml"));
+
+            Scene scene = new Scene(loader.load());
+
+            CartController controller = loader.getController();
+            controller.setCart(cart);
+
+            Stage stage = new Stage();
+            stage.setTitle("Shopping Cart");
+            stage.setScene(scene);
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Alertutil.showErrorMessage("Failed to open cart view.");
+        }
     }
+
+
 
     /**
      * Handles the "Logout" button action.
