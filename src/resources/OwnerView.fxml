@@ -52,7 +52,9 @@
                               <TextField fx:id="txtProductStock" />
                               <Label text="Threshold" />
                               <TextField fx:id="txtProductThreshold" />
-                              <Button mnemonicParsing="false" onAction="#handleAddProduct" prefWidth="275.0" text="Add Product" />
+                               <Label text="If stock ≤ threshold, price doubles"
+                                      style="-fx-font-size: 11px; -fx-text-fill: gray;" />
+                               <Button mnemonicParsing="false" onAction="#handleAddProduct" prefWidth="275.0" text="Add Product" />
                               <Button mnemonicParsing="false" onAction="#handleUpdateProduct" prefWidth="275.0" text="Update Selected" />
                               <Button mnemonicParsing="false" onAction="#handleDeleteProduct" prefWidth="275.0" style="-fx-background-color: #ff4d4d;" text="Delete Selected" textFill="WHITE" />
                            </children>

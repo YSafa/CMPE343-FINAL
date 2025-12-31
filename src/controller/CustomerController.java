@@ -51,6 +51,9 @@ public class CustomerController implements Initializable
     private TableColumn<Product, String> nameColumn;
 
     @FXML
+    private Label welcomeLabel;
+
+    @FXML
     private TableColumn<Product, String> typeColumn; // For 'fruit' or 'vegetable'
 
     @FXML
@@ -83,9 +86,13 @@ public class CustomerController implements Initializable
 
     private static final double MIN_ORDER_AMOUNT = 200.0;
 
-    public void setCurrentUser(User user) {
+    public void setCurrentUser(User user)
+    {
         this.currentUser = user;
+        welcomeLabel.setText("Welcome, " + user.getUsername());
     }
+
+
 
     /**
      * Initializes the table columns and loads all products from the database.

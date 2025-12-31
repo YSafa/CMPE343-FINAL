@@ -10,11 +10,14 @@
 
     <top>
         <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 10;">
-            <Label text="Welcome, Customer" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+            <Label fx:id="welcomeLabel"
+                   text="Welcome"
+                   style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
             <Button text="View Cart" onAction="#handleViewCart"/>
             <Button text="Logout" onAction="#handleLogout"/>
         </HBox>
     </top>
+
 
     <center>
         <VBox spacing="10" alignment="CENTER" style="-fx-padding: 20;">
