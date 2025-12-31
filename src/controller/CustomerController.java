@@ -9,6 +9,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import util.Alertutil;
+
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -96,7 +98,7 @@ public class CustomerController implements Initializable
     private void handleAddToCart() {
         // 1. Seçim kontrolü
         if (selectedProduct == null) {
-            util.AlertUtil.showWarningMessage("Lütfen önce tablodan bir ürün seçin!");
+            Alertutil.showWarningMessage("Lütfen önce tablodan bir ürün seçin!");
             return;
         }
 
@@ -104,7 +106,7 @@ public class CustomerController implements Initializable
             // 2. Boş miktar kontrolü
             String text = amountField.getText();
             if (text == null || text.isEmpty()) {
-                util.AlertUtil.showWarningMessage("Lütfen bir miktar giriniz.");
+                Alertutil.showWarningMessage("Lütfen bir miktar giriniz.");
                 return;
             }
 
@@ -112,24 +114,24 @@ public class CustomerController implements Initializable
 
             // 3. Negatif/Sıfır miktar kontrolü (Logical Error)
             if (amount <= 0) {
-                util.AlertUtil.showWarningMessage("Miktar 0'dan büyük olmalıdır!");
+                Alertutil.showWarningMessage("Miktar 0'dan büyük olmalıdır!");
                 return;
             }
 
             // 4. Stok yeterli mi kontrolü
             if (amount > selectedProduct.getStock()) {
-                util.AlertUtil.showWarningMessage("Yetersiz stok! Mevcut: " + selectedProduct.getStock() + " kg");
+                Alertutil.showWarningMessage("Yetersiz stok! Mevcut: " + selectedProduct.getStock() + " kg");
                 return;
             }
 
             // 5. Sepete ekle ve giriş alanını temizle
             cart.addItem(selectedProduct, amount);
-            util.AlertUtil.showSuccessMessage(amount + " kg " + selectedProduct.getName() + " sepete eklendi.");
+            Alertutil.showSuccessMessage(amount + " kg " + selectedProduct.getName() + " sepete eklendi.");
             amountField.clear();
 
         } catch (NumberFormatException e) {
             // Harf girilirse projede belirtilen hatayı engellemiş oluyoruz
-            util.AlertUtil.showErrorMessage("Hata: Lütfen geçerli bir sayı giriniz (Örn: 1.5)");
+            Alertutil.showErrorMessage("Hata: Lütfen geçerli bir sayı giriniz (Örn: 1.5)");
         }
     }
 
