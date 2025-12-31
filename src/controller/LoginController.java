@@ -75,13 +75,17 @@ public class LoginController {
                     case "carrier":
                         loader = new FXMLLoader(getClass().getResource("/resources/CarrierView.fxml"));
                         root = loader.load();
-                        scene = new Scene(root, 960, 540); 
-                        
+                        scene = new Scene(root, 960, 540);
+
+                        CarrierController carrierController = loader.getController();
+                        carrierController.setCurrentCarrier(loggedInUser);
+
                         stage.setTitle("Group29 GreenGrocer");
                         stage.setScene(scene);
                         stage.centerOnScreen();
                         stage.show();
                         break;
+
 
                     case "owner":
                         loader = new FXMLLoader(getClass().getResource("/resources/OwnerView.fxml"));

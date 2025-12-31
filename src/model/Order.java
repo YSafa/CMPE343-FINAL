@@ -12,6 +12,8 @@ public class Order
     private int carrierId;
     private boolean isDelivered; // tinyint(1) -> boolean
     private double totalCost;
+    private String customerName;
+    private String customerAddress;
     //private String invoiceContent;
 
     public Order(int id, Timestamp orderTime, Timestamp deliveryTime, String products,
@@ -29,6 +31,10 @@ public class Order
     }
 
     // Getters...
+    public String getCustomerName() { return customerName; }
+    public void setCustomerName(String customerName) { this.customerName = customerName; }
+    public String getCustomerAddress() { return customerAddress; }
+    public void setCustomerAddress(String customerAddress) { this.customerAddress = customerAddress; }
     public int getId() { return id; }
     public Timestamp getOrderTime() { return orderTime; }
     public Timestamp getDeliveryTime() { return deliveryTime; }

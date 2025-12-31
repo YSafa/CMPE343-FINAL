@@ -1,11 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml">
-    <Label text="Carrier Dashboard"
-           style="-fx-font-size: 20px;"
-           AnchorPane.topAnchor="100"
-           AnchorPane.leftAnchor="100"/>
-</AnchorPane>
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controller.CarrierController"
+            prefWidth="960" prefHeight="540">
+
+    <top>
+        <HBox spacing="10" alignment="CENTER_RIGHT" style="-fx-padding:10;">
+            <Label text="Carrier Dashboard" style="-fx-font-size:18px; -fx-font-weight:bold;"/>
+            <Button text="Refresh" onAction="#handleRefresh"/>
+        </HBox>
+    </top>
+
+    <center>
+        <TabPane tabClosingPolicy="UNAVAILABLE">
+            <tabs>
+
+                <!-- 1) AVAILABLE -->
+                <Tab text="Available Orders">
+                    <BorderPane>
+                        <center>
+                            <TableView fx:id="tableAvailable">
+                                <columns>
+                                    <TableColumn fx:id="colAvailId" text="Order ID" prefWidth="80"/>
+                                    <TableColumn fx:id="colAvailProducts" text="Products" prefWidth="260"/>
+                                    <TableColumn fx:id="colAvailCustomer" text="Customer" prefWidth="120"/>
+                                    <TableColumn fx:id="colAvailAddress" text="Address" prefWidth="220"/>
+                                    <TableColumn fx:id="colAvailTotal" text="Total" prefWidth="90"/>
+                                    <TableColumn fx:id="colAvailDelivery" text="Delivery Time" prefWidth="170"/>
+                                </columns>
+                            </TableView>
+                        </center>
+                        <bottom>
+                            <HBox alignment="CENTER" spacing="10" style="-fx-padding:10;">
+                                <Button text="Claim Selected Order" onAction="#handleClaimSelectedAvailable"/>
+                            </HBox>
+                        </bottom>
+                    </BorderPane>
+                </Tab>
+
+                <!-- 2) SELECTED -->
+                <Tab text="Selected Orders">
+                    <BorderPane>
+                        <top>
+                            <HBox alignment="CENTER" spacing="10" style="-fx-padding:10;">
+                                <Label text="Delivered Date:"/>
+                                <DatePicker fx:id="deliveredDatePicker"/>
+                                <Label text="Hour:"/>
+                                <ComboBox fx:id="deliveredHourBox" prefWidth="80"/>
+                                <Button text="Mark Selected as Delivered" onAction="#handleCompleteSelectedOrder"/>
+                            </HBox>
+                        </top>
+                        <center>
+                            <TableView fx:id="tableSelected">
+                                <columns>
+                                    <TableColumn fx:id="colSelId" text="Order ID" prefWidth="80"/>
+                                    <TableColumn fx:id="colSelProducts" text="Products" prefWidth="260"/>
+                                    <TableColumn fx:id="colSelCustomer" text="Customer" prefWidth="120"/>
+                                    <TableColumn fx:id="colSelAddress" text="Address" prefWidth="220"/>
+                                    <TableColumn fx:id="colSelTotal" text="Total" prefWidth="90"/>
+                                    <TableColumn fx:id="colSelDelivery" text="Delivery Time" prefWidth="170"/>
+                                </columns>
+                            </TableView>
+                        </center>
+                    </BorderPane>
+                </Tab>
+
+                <!-- 3) COMPLETED -->
+                <Tab text="Completed Deliveries">
+                    <BorderPane>
+                        <center>
+                            <TableView fx:id="tableCompleted">
+                                <columns>
+                                    <TableColumn fx:id="colComId" text="Order ID" prefWidth="80"/>
+                                    <TableColumn fx:id="colComProducts" text="Products" prefWidth="360"/>
+                                    <TableColumn fx:id="colComCustomer" text="Customer" prefWidth="160"/>
+                                    <TableColumn fx:id="colComTotal" text="Total" prefWidth="100"/>
+                                    <TableColumn fx:id="colComDelivered" text="Delivered Time" prefWidth="220"/>
+                                </columns>
+                            </TableView>
+                        </center>
+                    </BorderPane>
+                </Tab>
+
+            </tabs>
+        </TabPane>
+    </center>
+
+</BorderPane>
