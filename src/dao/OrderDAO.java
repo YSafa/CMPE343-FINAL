@@ -27,9 +27,11 @@ public class OrderDAO
      * @param cart The cart containing items.
      * @return true if both order insertion and stock updates are successful.
      */
-    public boolean placeOrderWithTransaction(User user, Cart cart)
+    public boolean placeOrderWithTransaction(User user, Cart cart, LocalDateTime deliveryTime)
     {
-        String insertOrderSQL = "INSERT INTO orderinfo (ordertime, products, user_id, carrier_id, isdelivered, totalcost) VALUES (?, ?, ?, ?, ?, ?)";
+        String insertOrderSQL =
+                "INSERT INTO orderinfo (ordertime, deliverytime, products, user_id, carrier_id, isdelivered, totalcost) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?)";
         String updateStockSQL = "UPDATE productinfo SET stock = stock - ? WHERE id = ?";
 
         Connection conn = null;
@@ -47,11 +49,13 @@ public class OrderDAO
             try (PreparedStatement orderStmt = conn.prepareStatement(insertOrderSQL))
             {
                 orderStmt.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
-                orderStmt.setString(2, cart.getCartContentAsString());
-                orderStmt.setInt(3, user.getId());
-                orderStmt.setInt(4, 0); // 0 means no carrier assigned yet
-                orderStmt.setInt(5, 0); // 0 means not delivered
-                orderStmt.setDouble(6, cart.getTotalPrice());
+                orderStmt.setTimestamp(2, Timestamp.valueOf(deliveryTime));
+                orderStmt.setString(3, cart.getCartContentAsString());
+                orderStmt.setInt(4, user.getId());
+                orderStmt.setInt(5, 0); // carrier_id
+                orderStmt.setInt(6, 0); // isdelivered
+                orderStmt.setDouble(7, cart.getTotalPrice());
+
 
                 orderStmt.executeUpdate();
             }

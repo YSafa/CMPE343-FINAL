@@ -11,6 +11,7 @@ import java.sql.ResultSet;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import model.User;
 
 
 
@@ -33,7 +34,7 @@ public class LoginController {
             return;
         }
 
-        String sql = "SELECT role FROM userinfo WHERE username = ? AND password = ?";
+        String sql = "SELECT * FROM userinfo WHERE username = ? AND password = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -44,7 +45,16 @@ public class LoginController {
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                String role = rs.getString("role");
+
+                User loggedInUser = new User(
+                        rs.getInt("id"),
+                        rs.getString("username"),
+                        rs.getString("password"),
+                        rs.getString("role"),
+                        rs.getString("address") // varsa
+                );
+
+                String role = loggedInUser.getRole();
 
                 Stage stage = (Stage) usernameField.getScene().getWindow();
                 FXMLLoader loader;
@@ -52,27 +62,33 @@ public class LoginController {
                 switch (role) {
                     case "customer":
                         loader = new FXMLLoader(getClass().getResource("/resources/CustomerView.fxml"));
+                        Scene scene = new Scene(loader.load());
+
+                        CustomerController controller = loader.getController();
+                        controller.setCurrentUser(loggedInUser);
+
+                        stage.setScene(scene);
+                        stage.show();
                         break;
+
                     case "carrier":
                         loader = new FXMLLoader(getClass().getResource("/resources/CarrierView.fxml"));
+                        stage.setScene(new Scene(loader.load()));
+                        stage.show();
                         break;
+
                     case "owner":
                         loader = new FXMLLoader(getClass().getResource("/resources/OwnerView.fxml"));
+                        stage.setScene(new Scene(loader.load()));
+                        stage.show();
                         break;
+
                     default:
                         showAlert("Error", "Unknown role!");
-                        return;
                 }
 
-                Scene scene = new Scene(loader.load());
-                stage.setScene(scene);
-                stage.show();
-
-
-
-            } else {
-                showAlert("Error", "Invalid username or password!");
             }
+
 
         } catch (Exception e) {
             e.printStackTrace();

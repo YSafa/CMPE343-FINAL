@@ -10,9 +10,10 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import model.User;
 import util.Alertutil;
 import model.Cart;
-import dao.ProductDAO;
+import dao.OrderDAO;
 import model.CartItem;
 
 
@@ -26,6 +27,12 @@ import java.util.ResourceBundle;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+
+
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 
 
@@ -58,6 +65,13 @@ public class CustomerController implements Initializable
     @FXML
     private javafx.scene.control.TextField amountField; // Miktar girişi için
 
+    @FXML
+    private DatePicker deliveryDatePicker;
+
+    @FXML
+    private ComboBox<Integer> deliveryHourBox;
+
+
     private Product selectedProduct; // Seçilen ürünü takip etmek için
     //private model.Cart cart = new model.Cart(); // Müşterinin sepetini oluştur
     private final Cart cart = new Cart();
@@ -65,6 +79,13 @@ public class CustomerController implements Initializable
     // List to hold data
     private final ObservableList<Product> productList = FXCollections.observableArrayList();
 
+    private User currentUser;
+
+    private static final double MIN_ORDER_AMOUNT = 200.0;
+
+    public void setCurrentUser(User user) {
+        this.currentUser = user;
+    }
 
     /**
      * Initializes the table columns and loads all products from the database.
@@ -101,6 +122,13 @@ public class CustomerController implements Initializable
         });
 
         loadProducts();
+
+        // Delivery hour options: 0..23
+        for (int h = 0; h < 24; h++) {
+            deliveryHourBox.getItems().add(h);
+        }
+        deliveryHourBox.getSelectionModel().select(LocalTime.now().getHour()); // opsiyonel
+
     }
 
     /**
@@ -227,47 +255,62 @@ public class CustomerController implements Initializable
     @FXML
     private void handleCompletePurchase() {
 
-        //  Sepet boş mu?
         if (cart.getItems().isEmpty()) {
             Alertutil.showWarningMessage("Your cart is empty.");
             return;
         }
 
-        ProductDAO productDAO = new ProductDAO();
+        // Minimum sepet tutarı kontrolü
+        if (cart.getTotalPrice() < MIN_ORDER_AMOUNT) {
+            Alertutil.showWarningMessage(
+                    "Minimum order amount is " + MIN_ORDER_AMOUNT + " TL"
+            );
+            return;
+        }
 
-        try {
-            //  Sepetteki her ürün için stok düş
-            for (CartItem item : cart.getItems()) {
+        // 1) Delivery seçim kontrolü
+        if (deliveryDatePicker.getValue() == null || deliveryHourBox.getValue() == null) {
+            Alertutil.showWarningMessage("Please select a delivery date and hour.");
+            return;
+        }
 
-                boolean success = productDAO.reduceStock(
-                        item.getProduct().getId(),
-                        item.getQuantity()
-                );
+        LocalDateTime deliveryTime = LocalDateTime.of(
+                deliveryDatePicker.getValue(),
+                LocalTime.of(deliveryHourBox.getValue(), 0)
+        );
 
-                if (!success) {
-                    throw new RuntimeException("Stock update failed for product: "
-                            + item.getProduct().getName());
-                }
-            }
+        LocalDateTime now = LocalDateTime.now();
 
-            //  Sepeti temizle
+        // 2) Geçmiş zaman olmasın
+        if (deliveryTime.isBefore(now)) {
+            Alertutil.showWarningMessage("Delivery time cannot be in the past.");
+            return;
+        }
+
+        // 3) 48 saat kuralı
+        if (deliveryTime.isAfter(now.plusHours(48))) {
+            Alertutil.showWarningMessage("Delivery time must be within 48 hours.");
+            return;
+        }
+
+
+        if (currentUser == null) {
+            Alertutil.showErrorMessage("User session not found. Please login again.");
+            return;
+        }
+
+        OrderDAO orderDAO = new OrderDAO();
+
+        boolean success = orderDAO.placeOrderWithTransaction(currentUser, cart, deliveryTime);
+
+        if (success) {
             cart.clear();
-
-            //  Ürün tablosunu yenile
-            loadProducts();
-
-            Alertutil.showSuccessMessage("Purchase completed successfully!");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            Alertutil.showErrorMessage("Purchase failed. Please try again.");
+            loadProducts(); // refresh stock values
+            Alertutil.showSuccessMessage("Order placed successfully!");
+            deliveryDatePicker.setValue(null);
+            deliveryHourBox.getSelectionModel().clearSelection();
+        } else {
+            Alertutil.showErrorMessage("Order failed. No changes were made.");
         }
     }
-
-
-
-
-
-
-
 }

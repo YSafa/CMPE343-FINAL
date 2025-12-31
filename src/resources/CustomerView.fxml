@@ -41,5 +41,14 @@
             <Button text="Complete Purchase" onAction="#handleCompletePurchase"/>
         </HBox>
     </bottom>
+
+    <HBox spacing="10">
+        <Label text="Delivery Date:" />
+        <DatePicker fx:id="deliveryDatePicker"/>
+
+        <Label text="Hour:" />
+        <ComboBox fx:id="deliveryHourBox" prefWidth="90"/>
+    </HBox>
+
 </BorderPane>
 
