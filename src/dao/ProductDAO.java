@@ -83,28 +83,27 @@ public class ProductDAO
      * * @param product The product object to add.
      * @return true if added successfully.
      */
-    public boolean addProduct(Product product)
+public boolean addProduct(Product product)
+{
+    String sql = "INSERT INTO productinfo (name, type, price, stock, image, threshold) VALUES (?, ?, ?, ?, ?, ?)";
+
+    try (Connection conn = DatabaseConnection.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql))
     {
-        String sql = "INSERT INTO productinfo (name, type, price, stock, imagelocation, threshold) VALUES (?, ?, ?, ?, ?, ?)";
+        stmt.setString(1, product.getName());
+        stmt.setString(2, product.getType());
+        stmt.setDouble(3, product.getPrice());
+        stmt.setDouble(4, product.getStock());
+        stmt.setBytes(5, product.getImage()); // BLOB verisi buraya gidiyor
+        stmt.setDouble(6, product.getThreshold());
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql))
-        {
+        return stmt.executeUpdate() > 0;
 
-            stmt.setString(1, product.getName());
-            stmt.setString(2, product.getType());
-            stmt.setDouble(3, product.getPrice());
-            stmt.setDouble(4, product.getStock());
-            stmt.setBytes(5, product.getImage());
-            stmt.setDouble(6, product.getThreshold());
-
-            return stmt.executeUpdate() > 0;
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
     }
+}
     public boolean updateProduct(Product product) {
         String sql = "UPDATE productinfo SET name=?, type=?, price=?, stock=?, image=?, threshold=? WHERE id=?";
         try (Connection conn = DatabaseConnection.getConnection();
