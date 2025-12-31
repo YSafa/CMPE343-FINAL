@@ -12,6 +12,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import util.Alertutil;
 import model.Cart;
+import dao.ProductDAO;
+import model.CartItem;
+
 
 import java.io.ByteArrayInputStream;
 import java.net.URL;
@@ -223,8 +226,44 @@ public class CustomerController implements Initializable
      */
     @FXML
     private void handleCompletePurchase() {
-        Alertutil.showSuccessMessage("Purchase completed successfully!");
+
+        //  Sepet boş mu?
+        if (cart.getItems().isEmpty()) {
+            Alertutil.showWarningMessage("Your cart is empty.");
+            return;
+        }
+
+        ProductDAO productDAO = new ProductDAO();
+
+        try {
+            //  Sepetteki her ürün için stok düş
+            for (CartItem item : cart.getItems()) {
+
+                boolean success = productDAO.reduceStock(
+                        item.getProduct().getId(),
+                        item.getQuantity()
+                );
+
+                if (!success) {
+                    throw new RuntimeException("Stock update failed for product: "
+                            + item.getProduct().getName());
+                }
+            }
+
+            //  Sepeti temizle
+            cart.clear();
+
+            //  Ürün tablosunu yenile
+            loadProducts();
+
+            Alertutil.showSuccessMessage("Purchase completed successfully!");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Alertutil.showErrorMessage("Purchase failed. Please try again.");
+        }
     }
+
 
 
 

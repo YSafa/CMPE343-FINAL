@@ -8,7 +8,7 @@ public class DatabaseConnection {
 
 
     private static final String URL = "jdbc:mysql://localhost:3306/greengrocerdb";
-    private static final String USER = "root";
+    private static final String USER = "myuser";
     private static final String PASSWORD = "1234";
 
     /**
