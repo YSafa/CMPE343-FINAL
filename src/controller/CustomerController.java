@@ -33,6 +33,12 @@ public class CustomerController implements Initializable
     @FXML
     private TableColumn<Product, Double> stockColumn; // changed to Double
 
+    @FXML
+    private javafx.scene.control.TextField amountField; // Miktar girişi için
+
+    private Product selectedProduct; // Seçilen ürünü takip etmek için
+    private model.Cart cart = new model.Cart(); // Müşterinin sepetini oluştur
+
     // List to hold data
     private ObservableList<Product> productList = FXCollections.observableArrayList();
 
@@ -45,13 +51,20 @@ public class CustomerController implements Initializable
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
         stockColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
 
+        // TABLO SEÇİM DİNLEYİCİSİ: Satıra tıklandığında ürünü 'selectedProduct' içine atar
+        productTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                selectedProduct = newSelection;
+            }
+        });
+
         loadProducts();
     }
 
     private void loadProducts()
     {
         // Using the table name
-        String sql = "SELECT * FROM productinfo";
+        String sql = "SELECT * FROM productinfo WHERE stock  > 0 ORDER BY name ASC";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -66,7 +79,7 @@ public class CustomerController implements Initializable
                         rs.getString("type"), // Enum comes as String
                         rs.getDouble("price"),
                         rs.getDouble("stock"),
-                        rs.getString("imagelocation"),
+                        rs.getBytes("image"),
                         rs.getDouble("threshold")
                 );
                 productList.add(product);
@@ -79,4 +92,45 @@ public class CustomerController implements Initializable
             System.err.println("Error loading products from productinfo.");
         }
     }
+    @FXML
+    private void handleAddToCart() {
+        // 1. Seçim kontrolü
+        if (selectedProduct == null) {
+            util.AlertUtil.showWarningMessage("Lütfen önce tablodan bir ürün seçin!");
+            return;
+        }
+
+        try {
+            // 2. Boş miktar kontrolü
+            String text = amountField.getText();
+            if (text == null || text.isEmpty()) {
+                util.AlertUtil.showWarningMessage("Lütfen bir miktar giriniz.");
+                return;
+            }
+
+            double amount = Double.parseDouble(text);
+
+            // 3. Negatif/Sıfır miktar kontrolü (Logical Error)
+            if (amount <= 0) {
+                util.AlertUtil.showWarningMessage("Miktar 0'dan büyük olmalıdır!");
+                return;
+            }
+
+            // 4. Stok yeterli mi kontrolü
+            if (amount > selectedProduct.getStock()) {
+                util.AlertUtil.showWarningMessage("Yetersiz stok! Mevcut: " + selectedProduct.getStock() + " kg");
+                return;
+            }
+
+            // 5. Sepete ekle ve giriş alanını temizle
+            cart.addItem(selectedProduct, amount);
+            util.AlertUtil.showSuccessMessage(amount + " kg " + selectedProduct.getName() + " sepete eklendi.");
+            amountField.clear();
+
+        } catch (NumberFormatException e) {
+            // Harf girilirse projede belirtilen hatayı engellemiş oluyoruz
+            util.AlertUtil.showErrorMessage("Hata: Lütfen geçerli bir sayı giriniz (Örn: 1.5)");
+        }
+    }
+
 }

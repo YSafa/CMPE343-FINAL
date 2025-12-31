@@ -67,9 +67,8 @@ public class ProductDAO
                         rs.getString("type"), // enum as string
                         rs.getDouble("price"),
                         rs.getDouble("stock"),
-                        rs.getString("imagelocation"),
-                        rs.getDouble("threshold")
-                );
+                        rs.getBytes("image"),
+                        rs.getDouble("threshold"));
                 products.add(p);
             }
         } catch (SQLException e) {
@@ -96,7 +95,7 @@ public class ProductDAO
             stmt.setString(2, product.getType());
             stmt.setDouble(3, product.getPrice());
             stmt.setDouble(4, product.getStock());
-            stmt.setString(5, product.getImageLocation());
+            stmt.setBytes(5, product.getImage());
             stmt.setDouble(6, product.getThreshold());
 
             return stmt.executeUpdate() > 0;
