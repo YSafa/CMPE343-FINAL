@@ -21,23 +21,42 @@ public class Alertutil {
     }
 
     /**
-     * Kritik hatalar için (örn: Veritabanı bağlantı hatası)
+     * Displays a critical error alert.
+     * Used for unexpected or system-level errors.
+     *
+     * @param message Error message to display.
      */
     public static void showErrorMessage(String message) {
         showAlert("Error", "An error occurred", message, AlertType.ERROR);
     }
 
     /**
-     * Kullanıcı hataları için (örn: Stok yetersiz, Geçersiz miktar)
+     * Displays a warning alert.
+     * Used for user mistakes or invalid inputs.
+     *
+     * @param message Warning message to display.
      */
     public static void showWarningMessage(String message) {
         showAlert("Warning", "Attention Needed", message, AlertType.WARNING);
     }
 
     /**
-     * Başarılı işlemler için (örn: Sipariş tamamlandı, Kayıt başarılı)
+     * Displays a success alert.
+     * Used when an operation completes successfully.
+     *
+     * @param message Success message to display.
      */
     public static void showSuccessMessage(String message) {
         showAlert("Success", "Process Completed", message, AlertType.INFORMATION);
+    }
+
+    /**
+     * Displays an informational alert.
+     * Used to show general information or confirmation.
+     *
+     * @param message Informational message to display.
+     */
+    public static void showInfoMessage(String message) {
+        showAlert("Information", null, message, AlertType.INFORMATION);
     }
 }

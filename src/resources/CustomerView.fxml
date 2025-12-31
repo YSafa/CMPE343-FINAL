@@ -1,11 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml">
-    <Label text="Customer Dashboard"
-           style="-fx-font-size: 20px;"
-           AnchorPane.topAnchor="100"
-           AnchorPane.leftAnchor="100"/>
-</AnchorPane>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="controller.CustomerController"
+            prefWidth="960" prefHeight="540">
+
+    <top>
+        <HBox spacing="15" alignment="CENTER_RIGHT" style="-fx-padding: 10;">
+            <Label text="Welcome, Customer" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+            <Button text="View Cart" onAction="#handleViewCart"/>
+            <Button text="Logout" onAction="#handleLogout"/>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox spacing="10" alignment="CENTER" style="-fx-padding: 20;">
+            <TableView fx:id="productTable" prefHeight="400" prefWidth="900">
+                <columns>
+                    <TableColumn fx:id="imageColumn" text="Image" prefWidth="100"/>
+                    <TableColumn fx:id="nameColumn" text="Name" prefWidth="200"/>
+                    <TableColumn fx:id="typeColumn" text="Type" prefWidth="100"/>
+                    <TableColumn fx:id="priceColumn" text="Price (₺/kg)" prefWidth="100"/>
+                    <TableColumn fx:id="stockColumn" text="Stock (kg)" prefWidth="100"/>
+                </columns>
+            </TableView>
+
+            <HBox spacing="10" alignment="CENTER">
+                <Label text="Enter amount (kg):"/>
+                <TextField fx:id="amountField" prefWidth="80"/>
+                <Button text="Add to Cart" onAction="#handleAddToCart"/>
+            </HBox>
+        </VBox>
+    </center>
+
+    <bottom>
+        <HBox spacing="20" alignment="CENTER" style="-fx-padding: 10;">
+            <Button text="Complete Purchase" onAction="#handleCompletePurchase"/>
+        </HBox>
+    </bottom>
+</BorderPane>
+
