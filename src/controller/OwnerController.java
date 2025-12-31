@@ -5,15 +5,22 @@ import dao.ProductDAO;
 import dao.UserDAO;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 import model.Order;
 import model.Product;
 import model.User;
+
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 
 public class OwnerController {
 
@@ -47,7 +54,9 @@ public class OwnerController {
     public void initialize() {
         setupTableColumns();
         loadAllData();
-        comboProductType.setItems(FXCollections.observableArrayList("vegetable", "fruit")); 
+        if (comboProductType != null) {
+            comboProductType.setItems(FXCollections.observableArrayList("vegetable", "fruit"));
+        }
     }
 
     private void setupTableColumns() {
@@ -72,6 +81,31 @@ public class OwnerController {
         refreshOrderTable();
         updateSalesChart();
     }
+
+    @FXML
+private void handleLogout() {
+    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    alert.setTitle("Logout Confirmation");
+    alert.setHeaderText("You are about to log out.");
+    alert.setContentText("Are you sure you want to exit to the login screen?");
+
+    Optional<ButtonType> result = alert.showAndWait();
+
+    if (result.isPresent() && result.get() == ButtonType.OK) {
+        try {
+            Parent loginRoot = FXMLLoader.load(getClass().getResource("/resources/Login.fxml"));
+            Stage currentStage = (Stage) tableProducts.getScene().getWindow();
+            
+            Scene loginScene = new Scene(loginRoot);
+            currentStage.setScene(loginScene);
+            currentStage.centerOnScreen();
+            currentStage.show();
+        } catch (IOException e) {
+            showError("Logout failed: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+}
 
     @FXML
     private void handleAddProduct() {
@@ -159,10 +193,10 @@ public class OwnerController {
     }
 
     private void showError(String msg) {
-    Alert alert = new Alert(Alert.AlertType.ERROR);
-    alert.setTitle("Error"); 
-    alert.setHeaderText(null);
-    alert.setContentText(msg);
-    alert.showAndWait(); 
-}
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error"); 
+        alert.setHeaderText(null);
+        alert.setContentText(msg);
+        alert.showAndWait(); 
+    }
 }
