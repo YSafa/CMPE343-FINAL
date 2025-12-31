@@ -54,7 +54,7 @@ public class OrderDAO
                 orderStmt.setInt(4, user.getId());
                 orderStmt.setInt(5, 0); // carrier_id
                 orderStmt.setInt(6, 0); // isdelivered
-                orderStmt.setDouble(7, cart.getTotalPrice());
+                orderStmt.setDouble(7, cart.getTotalPriceWithVAT());
 
 
                 orderStmt.executeUpdate();

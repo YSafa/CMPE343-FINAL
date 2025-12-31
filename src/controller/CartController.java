@@ -68,7 +68,7 @@ public class CartController {
 
     private void updateTotal(Cart cart) {
         totalLabel.setText(
-                String.format("Total: ₺%.2f", cart.getTotalPrice())
+                String.format("Total (incl. VAT): ₺%.2f", cart.getTotalPriceWithVAT())
         );
     }
 
@@ -76,7 +76,9 @@ public class CartController {
     private void refresh() {
         if (cart == null) return;
         cartItems.setAll(cart.getItems());
-        totalLabel.setText(String.format("Total: ₺%.2f", cart.getTotalPrice()));
+        totalLabel.setText(
+                String.format("Total (incl. VAT): ₺%.2f", cart.getTotalPriceWithVAT())
+        );
     }
 
     @FXML

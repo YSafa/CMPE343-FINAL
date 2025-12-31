@@ -43,6 +43,15 @@ public class Cart
             items.add(new CartItem(product, quantity));
         }
     }
+    private static final double VAT_RATE = 0.18;
+
+    /**
+     * Calculates total price INCLUDING VAT.
+     * @return total price with VAT
+     */
+    public double getTotalPriceWithVAT() {
+        return getTotalPrice() * (1 + VAT_RATE);
+    }
 
     /**
      * Removes a product from the cart completely.

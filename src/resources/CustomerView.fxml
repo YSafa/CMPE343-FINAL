@@ -33,22 +33,25 @@
                 <TextField fx:id="amountField" prefWidth="80"/>
                 <Button text="Add to Cart" onAction="#handleAddToCart"/>
             </HBox>
+            <Label text="* All prices include 18% VAT"
+                   style="-fx-font-size: 11px; -fx-text-fill: gray;"/>
         </VBox>
     </center>
 
     <bottom>
-        <HBox spacing="20" alignment="CENTER" style="-fx-padding: 10;">
+        <VBox spacing="10" alignment="CENTER" style="-fx-padding: 10;">
+
+            <HBox spacing="10" alignment="CENTER">
+                <Label text="Delivery Date:" />
+                <DatePicker fx:id="deliveryDatePicker"/>
+
+                <Label text="Hour:" />
+                <ComboBox fx:id="deliveryHourBox" prefWidth="90"/>
+            </HBox>
+
             <Button text="Complete Purchase" onAction="#handleCompletePurchase"/>
-        </HBox>
+
+        </VBox>
     </bottom>
-
-    <HBox spacing="10">
-        <Label text="Delivery Date:" />
-        <DatePicker fx:id="deliveryDatePicker"/>
-
-        <Label text="Hour:" />
-        <ComboBox fx:id="deliveryHourBox" prefWidth="90"/>
-    </HBox>
-
 </BorderPane>
 
