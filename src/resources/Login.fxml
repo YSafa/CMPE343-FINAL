@@ -2,31 +2,56 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="controller.LoginController"
-            prefWidth="400" prefHeight="300">
-
-    <VBox spacing="15"
-          alignment="CENTER"
-          AnchorPane.topAnchor="50"
-          AnchorPane.leftAnchor="50"
-          AnchorPane.rightAnchor="50"
-          AnchorPane.bottomAnchor="50">
-
-        <Label text="Login"
-               style="-fx-font-size: 20px; -fx-font-weight: bold;" />
-
-        <TextField fx:id="usernameField"
-                   promptText="Username" />
-
-        <PasswordField fx:id="passwordField"
-                       promptText="Password" />
-
-        <Button text="Login"
-                onAction="#handleLogin"
-                prefWidth="120" />
-
+<HBox prefHeight="540.0" prefWidth="960.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.LoginController">
+    <VBox alignment="CENTER" prefWidth="420.0" spacing="25.0" style="-fx-background-color: white;">
+        <children>
+            <ImageView fitHeight="180.0" fitWidth="180.0" pickOnBounds="true" preserveRatio="true">
+                <image><Image url="@../resources/logo.png" /></image>
+            </ImageView>
+            <VBox alignment="CENTER" spacing="10.0">
+                <Label text="GREEN GROCER" textFill="#2e7d32">
+                    <font><Font name="System Bold" size="28.0" /></font>
+                </Label>
+                <Label text="Freshness and quality delivered to your door." textFill="#666666" wrapText="true" textAlignment="CENTER">
+                    <font><Font name="System Italic" size="14.0" /></font>
+                </Label>
+            </VBox>
+        </children>
     </VBox>
 
-</AnchorPane>
+    <StackPane HBox.hgrow="ALWAYS" style="-fx-background-image: url('/resources/background.png'); -fx-background-size: cover; -fx-background-position: center;">
+        <children>
+            <VBox fx:id="loginBox" alignment="CENTER" maxWidth="380.0" maxHeight="480.0" spacing="20.0" style="-fx-background-color: rgba(255, 255, 255, 0.95); -fx-background-radius: 20; -fx-padding: 40; -fx-border-color: #e0e0e0; -fx-border-radius: 20;">
+                <effect><DropShadow blurType="GAUSSIAN" radius="20.0" color="#00000022"/></effect>
+                
+                <Label text="Welcome Back" textFill="#333333">
+                    <font><Font name="System Bold" size="26.0" /></font>
+                </Label>
+
+                <VBox spacing="15.0">
+                    <children>
+                        <VBox spacing="8.0">
+                            <Label text="Username" style="-fx-font-weight: bold;" textFill="#555555" />
+                            <TextField fx:id="usernameField" prefHeight="45.0" style="-fx-background-radius: 10; -fx-border-color: #dcdcdc; -fx-border-radius: 10;" />
+                        </VBox>
+                        <VBox spacing="8.0">
+                            <Label text="Password" style="-fx-font-weight: bold;" textFill="#555555" />
+                            <PasswordField fx:id="passwordField" prefHeight="45.0" style="-fx-background-radius: 10; -fx-border-color: #dcdcdc; -fx-border-radius: 10;" />
+                        </VBox>
+                    </children>
+                </VBox>
+
+                <Button onAction="#handleLogin" prefHeight="50.0" prefWidth="380.0" text="LOGIN" style="-fx-background-color: #2e7d32; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-font-size: 16px; -fx-cursor: hand;" />
+                
+                <Label fx:id="errorLabel" textFill="#ff4d4d" wrapText="true" textAlignment="CENTER">
+                    <font><Font name="System Bold" size="13.0" /></font>
+                </Label>
+            </VBox>
+        </children>
+    </StackPane>
+</HBox>
