@@ -22,6 +22,8 @@ import util.Alertutil;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.Optional;
 
 public class OwnerController {
@@ -231,12 +233,18 @@ public class OwnerController {
     private void updateSalesChart() {
         salesChart.getData().clear();
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Revenue");
-        double total = 0;
+        series.setName("Daily Revenue");
+
+        Map<String, Double> dailyRevenue = new TreeMap<>();
         for (Order o : orderDAO.getAllOrdersWithDetails()) {
-            total += o.getTotalCost();
+            String date = o.getOrderTime().toLocalDateTime().toLocalDate().toString();
+            dailyRevenue.put(date, dailyRevenue.getOrDefault(date, 0.0) + o.getTotalCost());
         }
-        series.getData().add(new XYChart.Data<>("Total Revenue", total));
+
+        for (Map.Entry<String, Double> entry : dailyRevenue.entrySet()) {
+            series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
+        }
+        
         salesChart.getData().add(series);
     }
 
