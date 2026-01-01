@@ -3,6 +3,7 @@ package controller;
 import dao.OrderDAO;
 import dao.ProductDAO;
 import dao.UserDAO;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -19,8 +20,8 @@ import model.User;
 import util.Alertutil;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.List;
 import java.util.Optional;
 
 public class OwnerController {
@@ -43,6 +44,7 @@ public class OwnerController {
     @FXML private TableView<Order> tableOrders;
     @FXML private TableColumn<Order, Integer> colOrderId;
     @FXML private TableColumn<Order, Timestamp> colOrderTime;
+    @FXML private TableColumn<Order, String> colOrderCustomer, colOrderCarrier, colOrderStatus;
     @FXML private TableColumn<Order, Double> colOrderTotal;
 
     @FXML private BarChart<String, Number> salesChart;
@@ -74,6 +76,12 @@ public class OwnerController {
         colOrderId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colOrderTime.setCellValueFactory(new PropertyValueFactory<>("orderTime"));
         colOrderTotal.setCellValueFactory(new PropertyValueFactory<>("totalCost"));
+        colOrderCustomer.setCellValueFactory(new PropertyValueFactory<>("customerName"));
+        colOrderCarrier.setCellValueFactory(new PropertyValueFactory<>("carrierName"));
+        colOrderStatus.setCellValueFactory(cellData -> {
+            boolean delivered = cellData.getValue().isDelivered();
+            return new SimpleStringProperty(delivered ? "Delivered" : "Pending");
+        });
     }
 
     private void loadAllData() {
@@ -83,52 +91,47 @@ public class OwnerController {
         updateSalesChart();
     }
 
-   @FXML
-private void handleEmployCarrier() {
-    String username = txtCarrierUser.getText().trim();
-    String password = txtCarrierPass.getText();
-    String address = txtCarrierAddress.getText().trim();
+    @FXML
+    private void handleEmployCarrier() {
+        String username = txtCarrierUser.getText().trim();
+        String password = txtCarrierPass.getText();
+        String address = txtCarrierAddress.getText().trim();
 
-    if (username.isEmpty() || password.isEmpty() || address.isEmpty()) {
-        Alertutil.showWarningMessage("All fields must be filled!");
-        return;
-    }
+        if (username.isEmpty() || password.isEmpty() || address.isEmpty()) {
+            Alertutil.showWarningMessage("All fields must be filled!");
+            return;
+        }
 
-    if (!Character.isLetterOrDigit(username.charAt(0)) || 
-        !Character.isLetterOrDigit(password.charAt(0)) || 
-        !Character.isLetterOrDigit(address.charAt(0))) {
-        Alertutil.showWarningMessage("Fields cannot start with a symbol!");
-        return;
-    }
+        if (!Character.isLetterOrDigit(username.charAt(0)) || 
+            !Character.isLetterOrDigit(password.charAt(0)) || 
+            !Character.isLetterOrDigit(address.charAt(0))) {
+            Alertutil.showWarningMessage("Fields cannot start with a symbol!");
+            return;
+        }
 
-    if (username.length() < 4) {
-        Alertutil.showWarningMessage("Username must be at least 4 characters!");
-        return;
-    }
+        if (username.length() < 4 || password.length() < 4) {
+            Alertutil.showWarningMessage("Username and Password must be at least 4 characters!");
+            return;
+        }
 
-    if (password.length() < 4) {
-        Alertutil.showWarningMessage("Password must be at least 4 characters!");
-        return;
-    }
+        if (address.length() < 10) {
+            Alertutil.showWarningMessage("Address must be at least 10 characters!");
+            return;
+        }
 
-    if (address.length() < 10) {
-        Alertutil.showWarningMessage("Address must be at least 10 characters!");
-        return;
-    }
-
-    if (showConfirm("Employ Carrier", "Hire " + username + " as a new carrier?")) {
-        User newCarrier = new User(0, username, password, "carrier", address);
-        try {
-            if (userDAO.addUser(newCarrier)) {
-                refreshCarrierTable();
-                clearCarrierFields();
-                Alertutil.showSuccessMessage("Carrier employed successfully.");
+        if (showConfirm("Employ Carrier", "Hire " + username + " as a new carrier?")) {
+            User newCarrier = new User(0, username, password, "carrier", address);
+            try {
+                if (userDAO.addUser(newCarrier)) {
+                    refreshCarrierTable();
+                    clearCarrierFields();
+                    Alertutil.showSuccessMessage("Carrier employed successfully.");
+                }
+            } catch (SQLException e) {
+                Alertutil.showErrorMessage("Database error: Username might be taken.");
             }
-        } catch (java.sql.SQLException e) {
-            Alertutil.showErrorMessage("Database error: Username might be taken.");
         }
     }
-}
 
     @FXML
     private void handleFireCarrier() {
@@ -167,7 +170,10 @@ private void handleEmployCarrier() {
     @FXML
     private void handleUpdateProduct() {
         Product selected = tableProducts.getSelectionModel().getSelectedItem();
-        if (selected == null) { Alertutil.showWarningMessage("Select product first."); return; }
+        if (selected == null) { 
+            Alertutil.showWarningMessage("Select product first."); 
+            return; 
+        }
         if (!isProductInputValid()) return;
 
         if (showConfirm("Update Product", "Save changes?")) {
@@ -202,8 +208,9 @@ private void handleEmployCarrier() {
                 Parent root = FXMLLoader.load(getClass().getResource("/resources/Login.fxml"));
                 Stage stage = (Stage) tableProducts.getScene().getWindow();
                 stage.setScene(new Scene(root));
+                stage.centerOnScreen();
             } catch (IOException e) {
-                Alertutil.showErrorMessage("Logout error.");
+                Alertutil.showErrorMessage("Logout error: " + e.getMessage());
             }
         }
     }
@@ -217,7 +224,7 @@ private void handleEmployCarrier() {
     }
 
     private void refreshOrderTable() {
-        tableOrders.setItems(FXCollections.observableArrayList(orderDAO.getAllOrders()));
+        tableOrders.setItems(FXCollections.observableArrayList(orderDAO.getAllOrdersWithDetails()));
     }
 
     private void updateSalesChart() {
@@ -225,7 +232,9 @@ private void handleEmployCarrier() {
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Revenue");
         double total = 0;
-        for (Order o : orderDAO.getAllOrders()) total += o.getTotalCost();
+        for (Order o : orderDAO.getAllOrdersWithDetails()) {
+            total += o.getTotalCost();
+        }
         series.getData().add(new XYChart.Data<>("Total Revenue", total));
         salesChart.getData().add(series);
     }
@@ -243,12 +252,14 @@ private void handleEmployCarrier() {
     private boolean showConfirm(String title, String msg) {
         Alert a = new Alert(Alert.AlertType.CONFIRMATION, msg, ButtonType.OK, ButtonType.CANCEL);
         a.setTitle(title);
+        a.setHeaderText(null);
         Optional<ButtonType> res = a.showAndWait();
         return res.isPresent() && res.get() == ButtonType.OK;
     }
 
     private void clearProductFields() {
         txtProductName.clear(); txtProductPrice.clear(); txtProductStock.clear(); txtProductThreshold.clear();
+        comboProductType.getSelectionModel().clearSelection();
     }
 
     private void clearCarrierFields() {
