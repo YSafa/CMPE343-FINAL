@@ -16,6 +16,9 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import util.Alertutil;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
+
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -38,6 +41,7 @@ public class CustomerController implements Initializable {
     @FXML private TextField amountField;
     @FXML private DatePicker deliveryDatePicker;
     @FXML private ComboBox<Integer> deliveryHourBox;
+    @FXML private TextField searchField;
 
     private final Cart cart = new Cart();
     private final ObservableList<Product> productList = FXCollections.observableArrayList();
@@ -77,6 +81,35 @@ public class CustomerController implements Initializable {
         deliveryHourBox.getSelectionModel().select(LocalTime.now().getHour());
 
         loadProducts();
+
+        // --- Search filter setup ---
+        FilteredList<Product> filteredData = new FilteredList<>(productList, p -> true);
+
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredData.setPredicate(product -> {
+                // arama kutusu boşsa tüm ürünleri göster
+                if (newValue == null || newValue.isBlank()) {
+                    return true;
+                }
+
+                String lowerCaseFilter = newValue.toLowerCase();
+
+                // isim veya ürün tipiyle eşleşirse
+                if (product.getName().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                } else if (product.getType().toLowerCase().contains(lowerCaseFilter)) {
+                    return true;
+                }
+                return false; // eşleşmiyorsa gizle
+            });
+        });
+
+        // Sıralama desteği (tablo başlıklarına tıklama)
+        SortedList<Product> sortedData = new SortedList<>(filteredData);
+        sortedData.comparatorProperty().bind(productTable.comparatorProperty());
+        productTable.setItems(sortedData);
+
+
     }
 
     private void loadProducts() {
