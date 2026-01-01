@@ -28,17 +28,17 @@ public class OwnerController {
     @FXML private TableView<Product> tableProducts;
     @FXML private TableColumn<Product, Integer> colProdId;
     @FXML private TableColumn<Product, String> colProdName;
-    @FXML private TableColumn<Product, Double> colProdPrice;
-    @FXML private TableColumn<Product, Double> colProdStock;
-    @FXML private TableColumn<Product, Double> colProdThreshold;
+    @FXML private TableColumn<Product, Double> colProdPrice, colProdStock, colProdThreshold;
     
     @FXML private TextField txtProductName, txtProductPrice, txtProductStock, txtProductThreshold;
     @FXML private ComboBox<String> comboProductType;
 
     @FXML private TableView<User> tableCarriers;
     @FXML private TableColumn<User, Integer> colCarrId;
-    @FXML private TableColumn<User, String> colCarrUser;
-    @FXML private TableColumn<User, String> colCarrAddress;
+    @FXML private TableColumn<User, String> colCarrUser, colCarrAddress;
+    
+    @FXML private TextField txtCarrierUser, txtCarrierAddress;
+    @FXML private PasswordField txtCarrierPass;
 
     @FXML private TableView<Order> tableOrders;
     @FXML private TableColumn<Order, Integer> colOrderId;
@@ -83,74 +83,83 @@ public class OwnerController {
         updateSalesChart();
     }
 
-    private String formatProductName(String name) {
-        if (name == null || name.trim().isEmpty()) return "";
-        String trimmed = name.trim();
-        return trimmed.substring(0, 1).toUpperCase() + trimmed.substring(1).toLowerCase();
+   @FXML
+private void handleEmployCarrier() {
+    String username = txtCarrierUser.getText().trim();
+    String password = txtCarrierPass.getText();
+    String address = txtCarrierAddress.getText().trim();
+
+    if (username.isEmpty() || password.isEmpty() || address.isEmpty()) {
+        Alertutil.showWarningMessage("All fields must be filled!");
+        return;
     }
 
-    private boolean isInputValid() {
-        String name = txtProductName.getText();
-        String priceText = txtProductPrice.getText();
-        String stockText = txtProductStock.getText();
-        String thresholdText = txtProductThreshold.getText();
+    if (!Character.isLetterOrDigit(username.charAt(0)) || 
+        !Character.isLetterOrDigit(password.charAt(0)) || 
+        !Character.isLetterOrDigit(address.charAt(0))) {
+        Alertutil.showWarningMessage("Fields cannot start with a symbol!");
+        return;
+    }
 
-        if (name == null || name.trim().isEmpty() || priceText.isEmpty() || stockText.isEmpty() || thresholdText.isEmpty()) {
-            Alertutil.showWarningMessage("All fields must be filled!");
-            return false;
-        }
+    if (username.length() < 4) {
+        Alertutil.showWarningMessage("Username must be at least 4 characters!");
+        return;
+    }
 
-        if (!name.trim().matches("^[a-zA-ZÇŞĞÜÖİçşğüöı\\s]+$")) {
-            Alertutil.showWarningMessage("Product name must contain only letters!");
-            return false;
-        }
+    if (password.length() < 4) {
+        Alertutil.showWarningMessage("Password must be at least 4 characters!");
+        return;
+    }
 
+    if (address.length() < 10) {
+        Alertutil.showWarningMessage("Address must be at least 10 characters!");
+        return;
+    }
+
+    if (showConfirm("Employ Carrier", "Hire " + username + " as a new carrier?")) {
+        User newCarrier = new User(0, username, password, "carrier", address);
         try {
-            double price = Double.parseDouble(priceText);
-            double stock = Double.parseDouble(stockText);
-            double threshold = Double.parseDouble(thresholdText);
+            if (userDAO.addUser(newCarrier)) {
+                refreshCarrierTable();
+                clearCarrierFields();
+                Alertutil.showSuccessMessage("Carrier employed successfully.");
+            }
+        } catch (java.sql.SQLException e) {
+            Alertutil.showErrorMessage("Database error: Username might be taken.");
+        }
+    }
+}
 
-            if (price <= 0) {
-                Alertutil.showWarningMessage("Price must be greater than zero!");
-                return false;
-            }
-            if (stock < 0) {
-                Alertutil.showWarningMessage("Stock cannot be negative!");
-                return false;
-            }
-            if (threshold <= 0) {
-                Alertutil.showWarningMessage("Threshold must be greater than zero!");
-                return false;
-            }
-            
-            if (comboProductType.getValue() == null) {
-                Alertutil.showWarningMessage("Please select a product type!");
-                return false;
-            }
-
-        } catch (NumberFormatException e) {
-            Alertutil.showErrorMessage("Price, Stock and Threshold must be valid numbers!");
-            return false;
+    @FXML
+    private void handleFireCarrier() {
+        User selected = tableCarriers.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            Alertutil.showWarningMessage("Please select a carrier to fire.");
+            return;
         }
 
-        return true;
+        if (showConfirm("Fire Carrier", "Terminate employment for " + selected.getUsername() + "?")) {
+            if (userDAO.deleteUser(selected.getId())) {
+                refreshCarrierTable();
+                Alertutil.showSuccessMessage("Carrier fired.");
+            }
+        }
     }
 
     @FXML
     private void handleAddProduct() {
-        if (!isInputValid()) return;
-
-        String formattedName = formatProductName(txtProductName.getText());
+        if (!isProductInputValid()) return;
+        String name = txtProductName.getText();
         double price = Double.parseDouble(txtProductPrice.getText());
         double stock = Double.parseDouble(txtProductStock.getText());
         double threshold = Double.parseDouble(txtProductThreshold.getText());
 
-        if (showConfirm("Add Product", "Add " + formattedName + " to system?")) {
-            Product p = new Product(0, formattedName, comboProductType.getValue(), price, stock, null, threshold);
+        if (showConfirm("Add Product", "Add " + name + " to system?")) {
+            Product p = new Product(0, name, comboProductType.getValue(), price, stock, null, threshold);
             if (productDAO.addProduct(p)) {
                 refreshProductTable();
                 clearProductFields();
-                Alertutil.showSuccessMessage("Product added successfully.");
+                Alertutil.showSuccessMessage("Product added.");
             }
         }
     }
@@ -158,53 +167,19 @@ public class OwnerController {
     @FXML
     private void handleUpdateProduct() {
         Product selected = tableProducts.getSelectionModel().getSelectedItem();
-        if (selected == null) {
-            Alertutil.showWarningMessage("Please select a product to update.");
-            return;
-        }
+        if (selected == null) { Alertutil.showWarningMessage("Select product first."); return; }
+        if (!isProductInputValid()) return;
 
-        if (!isInputValid()) return;
-
-        String formattedName = formatProductName(txtProductName.getText());
-        String newType = comboProductType.getValue();
-        double newPrice = Double.parseDouble(txtProductPrice.getText());
-        double newStock = Double.parseDouble(txtProductStock.getText());
-        double newThreshold = Double.parseDouble(txtProductThreshold.getText());
-
-        if (showConfirm("Update Product", "Save all changes for " + selected.getName() + "?")) {
-            selected.setName(formattedName);
-            selected.setType(newType);
-            selected.setPrice(newPrice);
-            selected.setStock(newStock);
-            selected.setThreshold(newThreshold);
+        if (showConfirm("Update Product", "Save changes?")) {
+            selected.setName(txtProductName.getText());
+            selected.setPrice(Double.parseDouble(txtProductPrice.getText()));
+            selected.setStock(Double.parseDouble(txtProductStock.getText()));
+            selected.setThreshold(Double.parseDouble(txtProductThreshold.getText()));
+            selected.setType(comboProductType.getValue());
 
             if (productDAO.updateProduct(selected)) {
                 refreshProductTable();
-                updateSalesChart();
-                Alertutil.showSuccessMessage("Product updated successfully.");
-            }
-        }
-    }
-
-    private boolean showConfirm(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        Optional<ButtonType> result = alert.showAndWait();
-        return result.isPresent() && result.get() == ButtonType.OK;
-    }
-
-    @FXML
-    private void handleLogout() {
-        if (showConfirm("Logout Confirmation", "Are you sure you want to log out?")) {
-            try {
-                Parent loginRoot = FXMLLoader.load(getClass().getResource("/resources/Login.fxml"));
-                Stage currentStage = (Stage) tableProducts.getScene().getWindow();
-                currentStage.setScene(new Scene(loginRoot));
-                currentStage.centerOnScreen();
-            } catch (IOException e) {
-                Alertutil.showErrorMessage("Logout failed: " + e.getMessage());
+                Alertutil.showSuccessMessage("Product updated.");
             }
         }
     }
@@ -212,22 +187,23 @@ public class OwnerController {
     @FXML
     private void handleDeleteProduct() {
         Product selected = tableProducts.getSelectionModel().getSelectedItem();
-        if (selected != null && showConfirm("Delete Product", "Delete " + selected.getName() + " permanently?")) {
+        if (selected != null && showConfirm("Delete", "Delete " + selected.getName() + "?")) {
             if (productDAO.deleteProduct(selected.getId())) {
                 refreshProductTable();
-                updateSalesChart();
                 Alertutil.showSuccessMessage("Product deleted.");
             }
         }
     }
 
     @FXML
-    private void handleFireCarrier() {
-        User selected = tableCarriers.getSelectionModel().getSelectedItem();
-        if (selected != null && showConfirm("Fire Carrier", "Terminate employment for " + selected.getUsername() + "?")) {
-            if (userDAO.deleteUser(selected.getId())) {
-                refreshCarrierTable();
-                Alertutil.showSuccessMessage("Carrier fired.");
+    private void handleLogout() {
+        if (showConfirm("Logout", "Are you sure?")) {
+            try {
+                Parent root = FXMLLoader.load(getClass().getResource("/resources/Login.fxml"));
+                Stage stage = (Stage) tableProducts.getScene().getWindow();
+                stage.setScene(new Scene(root));
+            } catch (IOException e) {
+                Alertutil.showErrorMessage("Logout error.");
             }
         }
     }
@@ -247,19 +223,35 @@ public class OwnerController {
     private void updateSalesChart() {
         salesChart.getData().clear();
         XYChart.Series<String, Number> series = new XYChart.Series<>();
-        series.setName("Revenue Analysis");
-        List<Order> orders = orderDAO.getAllOrders();
-        double totalRevenue = 0;
-        for (Order o : orders) totalRevenue += o.getTotalCost();
-        series.getData().add(new XYChart.Data<>("Total Revenue", totalRevenue));
+        series.setName("Revenue");
+        double total = 0;
+        for (Order o : orderDAO.getAllOrders()) total += o.getTotalCost();
+        series.getData().add(new XYChart.Data<>("Total Revenue", total));
         salesChart.getData().add(series);
     }
 
+    private boolean isProductInputValid() {
+        try {
+            if (txtProductName.getText().isEmpty() || comboProductType.getValue() == null) return false;
+            Double.parseDouble(txtProductPrice.getText());
+            Double.parseDouble(txtProductStock.getText());
+            Double.parseDouble(txtProductThreshold.getText());
+            return true;
+        } catch (Exception e) { return false; }
+    }
+
+    private boolean showConfirm(String title, String msg) {
+        Alert a = new Alert(Alert.AlertType.CONFIRMATION, msg, ButtonType.OK, ButtonType.CANCEL);
+        a.setTitle(title);
+        Optional<ButtonType> res = a.showAndWait();
+        return res.isPresent() && res.get() == ButtonType.OK;
+    }
+
     private void clearProductFields() {
-        txtProductName.clear();
-        txtProductPrice.clear();
-        txtProductStock.clear();
-        txtProductThreshold.clear();
-        comboProductType.getSelectionModel().clearSelection();
+        txtProductName.clear(); txtProductPrice.clear(); txtProductStock.clear(); txtProductThreshold.clear();
+    }
+
+    private void clearCarrierFields() {
+        txtCarrierUser.clear(); txtCarrierPass.clear(); txtCarrierAddress.clear();
     }
 }

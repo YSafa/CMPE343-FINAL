@@ -2,35 +2,17 @@ package dao;
 
 import database.DatabaseConnection;
 import model.User;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
-public class UserDAO
-{
-    public boolean isUsernameTaken(String username)
-    {
-        String sql = "SELECT id FROM userinfo WHERE username = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql))
-        {
-            stmt.setString(1, username);
-            ResultSet rs = stmt.executeQuery();
-            return rs.next();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return true;
-        }
-    }
+public class UserDAO {
 
-    public boolean registerCustomer(User user) throws SQLException {
-
-        String sql =
-                "INSERT INTO userinfo (username, password, role, address) VALUES (?, ?, ?, ?)";
-
+    public boolean addUser(User user) throws SQLException {
+        String sql = "INSERT INTO userinfo (username, password, role, address) VALUES (?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -42,8 +24,26 @@ public class UserDAO
             return stmt.executeUpdate() > 0;
         }
     }
-    public java.util.List<User> getUsersByRole(String role) {
-        java.util.List<User> users = new java.util.ArrayList<>();
+
+    public boolean registerCustomer(User user) throws SQLException {
+        return addUser(user);
+    }
+
+    public boolean isUsernameTaken(String username) {
+        String sql = "SELECT id FROM userinfo WHERE username = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return true;
+        }
+    }
+
+    public List<User> getUsersByRole(String role) {
+        List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM userinfo WHERE role = ?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -61,6 +61,7 @@ public class UserDAO
         }
         return users;
     }
+
     public boolean deleteUser(int id) {
         String sql = "DELETE FROM userinfo WHERE id = ?";
         try (Connection conn = DatabaseConnection.getConnection();
