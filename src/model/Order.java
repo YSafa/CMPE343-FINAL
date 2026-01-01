@@ -10,6 +10,7 @@ public class Order {
     private int userId;
     private int carrierId;
     private boolean delivered;
+    private boolean isCancelled;
     private double totalCost;
     private String customerName;
     private String customerAddress;
@@ -50,6 +51,9 @@ public class Order {
     public boolean isDelivered() { return delivered; }
     public void setDelivered(boolean delivered) { this.delivered = delivered; }
 
+    public boolean isCancelled() { return isCancelled; }
+    public void setCancelled(boolean cancelled) { this.isCancelled = cancelled;}
+
     public double getTotalCost() { return totalCost; }
     public void setTotalCost(double totalCost) { this.totalCost = totalCost; }
 
@@ -61,4 +65,12 @@ public class Order {
 
     public String getCarrierName() { return carrierName; }
     public void setCarrierName(String carrierName) { this.carrierName = carrierName; }
+
+    public String getStatus() {
+        if (isCancelled) return "Cancelled ❌";
+        if (delivered) return "Delivered ✅";
+        if (carrierId > 0) return "Assigned to Carrier 🚚";
+        return "Pending ⏳";
+    }
+
 }

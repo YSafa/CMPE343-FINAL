@@ -24,7 +24,9 @@
             </Label>
             <HBox alignment="CENTER_RIGHT" layoutX="600.0" layoutY="15.0" spacing="15.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="15.0">
                <children>
-                  <Button mnemonicParsing="false" onAction="#handleViewCart" prefHeight="30.0" prefWidth="100.0" style="-fx-cursor: hand;" text="View Cart" />
+                  <Button fx:id="refreshButton" mnemonicParsing="false" onAction="#handleRefresh" prefHeight="30.0" prefWidth="90.0" text="↻ Refresh" />
+                  <Button mnemonicParsing="false" onAction="#handleViewCart" prefHeight="30.0" prefWidth="90.0" style="-fx-cursor: hand;" text="View Cart" />
+                  <Button mnemonicParsing="false" onAction="#handleViewOrders" prefHeight="30.0" prefWidth="90.0" text="My Orders" />
                   <Button mnemonicParsing="false" onAction="#handleLogout" prefHeight="30.0" prefWidth="90.0" style="-fx-background-color: #ff4d4d; -fx-font-weight: bold; -fx-cursor: hand;" text="Logout" textFill="WHITE" />
                </children>
             </HBox>

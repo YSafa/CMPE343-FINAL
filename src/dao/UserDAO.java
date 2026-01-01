@@ -2,6 +2,7 @@ package dao;
 
 import database.DatabaseConnection;
 import model.User;
+import util.PasswordUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,7 +18,7 @@ public class UserDAO {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, user.getUsername());
-            stmt.setString(2, user.getPassword());
+            stmt.setString(2, PasswordUtil.hashPassword(user.getPassword())); //hashli
             stmt.setString(3, user.getRole());
             stmt.setString(4, user.getAddress());
 

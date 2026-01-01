@@ -81,10 +81,9 @@ public class OwnerController {
         colOrderCustomer.setCellValueFactory(new PropertyValueFactory<>("customerName"));
         colOrderCarrier.setCellValueFactory(new PropertyValueFactory<>("carrierName"));
         colOrderContent.setCellValueFactory(new PropertyValueFactory<>("products"));
-        colOrderStatus.setCellValueFactory(cellData -> {
-            boolean delivered = cellData.getValue().isDelivered();
-            return new SimpleStringProperty(delivered ? "Delivered" : "Pending");
-        });
+        colOrderStatus.setCellValueFactory(cellData ->
+                new SimpleStringProperty(cellData.getValue().getStatus())
+        );
     }
 
     private void loadAllData() {
@@ -155,7 +154,8 @@ public class OwnerController {
     @FXML
     private void handleAddProduct() {
         if (!isProductInputValid()) return;
-        String name = txtProductName.getText();
+
+        String name = txtProductName.getText().trim();
         double price = Double.parseDouble(txtProductPrice.getText());
         double stock = Double.parseDouble(txtProductStock.getText());
         double threshold = Double.parseDouble(txtProductThreshold.getText());
@@ -165,10 +165,11 @@ public class OwnerController {
             if (productDAO.addProduct(p)) {
                 refreshProductTable();
                 clearProductFields();
-                Alertutil.showSuccessMessage("Product added.");
             }
         }
     }
+
+
 
     @FXML
     private void handleUpdateProduct() {
@@ -237,16 +238,20 @@ public class OwnerController {
 
         Map<String, Double> dailyRevenue = new TreeMap<>();
         for (Order o : orderDAO.getAllOrdersWithDetails()) {
-            String date = o.getOrderTime().toLocalDateTime().toLocalDate().toString();
-            dailyRevenue.put(date, dailyRevenue.getOrDefault(date, 0.0) + o.getTotalCost());
+            // Sadece teslim edilmiş ve iptal edilmemiş siparişleri dahil et
+            if (o.isDelivered() && !o.isCancelled()) {
+                String date = o.getOrderTime().toLocalDateTime().toLocalDate().toString();
+                dailyRevenue.put(date, dailyRevenue.getOrDefault(date, 0.0) + o.getTotalCost());
+            }
         }
 
         for (Map.Entry<String, Double> entry : dailyRevenue.entrySet()) {
             series.getData().add(new XYChart.Data<>(entry.getKey(), entry.getValue()));
         }
-        
+
         salesChart.getData().add(series);
     }
+
 
     private boolean isProductInputValid() {
         try {

@@ -2,134 +2,140 @@ package dao;
 
 import database.DatabaseConnection;
 import model.Product;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import util.Alertutil;
+
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProductDAO
-{
+public class ProductDAO {
 
     /**
      * Reduces the stock of a specific product after a sale.
-     * This is critical for the 'Complete Order' process.
-     * * @param productId The ID of the product to update.
-     * @param quantitySold The amount to subtract from stock.
-     * @return true if update is successful.
      */
-    public boolean reduceStock(int productId, double quantitySold)
-    {
-        // SQL query to decrease the stock value
+    public boolean reduceStock(int productId, double quantitySold) {
         String sql = "UPDATE productinfo SET stock = stock - ? WHERE id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql))
-        {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             if (conn == null) return false;
 
-            // Set parameters
             stmt.setDouble(1, quantitySold);
             stmt.setInt(2, productId);
-
-            // Execute UPDATE
-            int rowsUpdated = stmt.executeUpdate();
-            return rowsUpdated > 0;
+            return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            Alertutil.showErrorMessage("Database error while reducing stock:\n" + e.getMessage());
             return false;
         }
     }
 
     /**
      * Fetches all products from the database.
-     * Useful for refreshing the table after an order.
-     * * @return A List of Product objects.
      */
-    public List<Product> getAllProducts()
-    {
+    public List<Product> getAllProducts() {
         List<Product> products = new ArrayList<>();
         String sql = "SELECT * FROM productinfo";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery())
-        {
+             ResultSet rs = stmt.executeQuery()) {
 
-            while (rs.next())
-            {
+            while (rs.next()) {
                 Product p = new Product(
                         rs.getInt("id"),
                         rs.getString("name"),
-                        rs.getString("type"), // enum as string
+                        rs.getString("type"),
                         rs.getDouble("price"),
                         rs.getDouble("stock"),
                         rs.getBytes("image"),
-                        rs.getDouble("threshold"));
+                        rs.getDouble("threshold")
+                );
                 products.add(p);
             }
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            Alertutil.showErrorMessage("Error while fetching products:\n" + e.getMessage());
         }
+
         return products;
     }
 
     /**
      * Adds a new product to the database.
-     * This will be used in the Owner (Patron) screen.
-     * * @param product The product object to add.
-     * @return true if added successfully.
      */
-public boolean addProduct(Product product)
-{
-    String sql = "INSERT INTO productinfo (name, type, price, stock, image, threshold) VALUES (?, ?, ?, ?, ?, ?)";
+    public boolean addProduct(Product product) {
+        String sql = "INSERT INTO productinfo (name, type, price, stock, image, threshold) VALUES (?, ?, ?, ?, ?, ?)";
 
-    try (Connection conn = DatabaseConnection.getConnection();
-         PreparedStatement stmt = conn.prepareStatement(sql))
-    {
-        stmt.setString(1, product.getName());
-        stmt.setString(2, product.getType());
-        stmt.setDouble(3, product.getPrice());
-        stmt.setDouble(4, product.getStock());
-        stmt.setBytes(5, product.getImage()); // BLOB verisi buraya gidiyor
-        stmt.setDouble(6, product.getThreshold());
-
-        return stmt.executeUpdate() > 0;
-
-    } catch (SQLException e) {
-        e.printStackTrace();
-        return false;
-    }
-}
-    public boolean updateProduct(Product product) {
-        String sql = "UPDATE productinfo SET name=?, type=?, price=?, stock=?, image=?, threshold=? WHERE id=?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setString(1, product.getName());
             stmt.setString(2, product.getType());
             stmt.setDouble(3, product.getPrice());
             stmt.setDouble(4, product.getStock());
-            stmt.setBytes(5, product.getImage()); // BLOB olarak resim [cite: 58]
+            stmt.setBytes(5, product.getImage());
             stmt.setDouble(6, product.getThreshold());
-            stmt.setInt(7, product.getId());
-            return stmt.executeUpdate() > 0;
+
+            stmt.executeUpdate();
+            return true;
+
+        } catch (SQLIntegrityConstraintViolationException e) {
+            // Duplicate product name error
+            Alertutil.showErrorMessage("A product with this name already exists!");
+            return false;
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            Alertutil.showErrorMessage("Database error while adding product:\n" + e.getMessage());
             return false;
         }
     }
 
-    public boolean deleteProduct(int id) {
-        String sql = "DELETE FROM productinfo WHERE id = ?";
+    /**
+     * Updates an existing product.
+     */
+    public boolean updateProduct(Product product) {
+        String sql = "UPDATE productinfo SET name=?, type=?, price=?, stock=?, image=?, threshold=? WHERE id=?";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            return stmt.executeUpdate() > 0;
+
+            stmt.setString(1, product.getName());
+            stmt.setString(2, product.getType());
+            stmt.setDouble(3, product.getPrice());
+            stmt.setDouble(4, product.getStock());
+            stmt.setBytes(5, product.getImage());
+            stmt.setDouble(6, product.getThreshold());
+            stmt.setInt(7, product.getId());
+
+            stmt.executeUpdate();
+            return true;
+
+        } catch (SQLIntegrityConstraintViolationException e) {
+            Alertutil.showErrorMessage("Cannot update — a product with this name already exists!");
+            return false;
+
         } catch (SQLException e) {
-            e.printStackTrace();
+            Alertutil.showErrorMessage("Database error while updating product:\n" + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Deletes a product by ID.
+     */
+    public boolean deleteProduct(int id) {
+        String sql = "DELETE FROM productinfo WHERE id = ?";
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+            return true;
+
+        } catch (SQLException e) {
+            Alertutil.showErrorMessage("Database error while deleting product:\n" + e.getMessage());
             return false;
         }
     }

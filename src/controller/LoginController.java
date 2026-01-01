@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import database.DatabaseConnection;
 import model.User;
+import util.PasswordUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -26,7 +27,7 @@ public class LoginController {
 
     @FXML
     private void handleLogin() {
-        String username = usernameField.getText();
+        String username = usernameField.getText().trim();
         String password = passwordField.getText();
 
         resetStyles();
@@ -45,9 +46,10 @@ public class LoginController {
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                String dbPassword = rs.getString("password");
+                String dbPassword = rs.getString("password"); // bu hashli haldir
+                String inputHash = PasswordUtil.hashPassword(password); //kullanıcı girişi hashleniyor
 
-                if (dbPassword.equals(password)) {
+                if (inputHash != null && inputHash.equals(dbPassword)) { // hash eşleşirse giriş başarılı
                     User user = new User(
                             rs.getInt("id"),
                             rs.getString("username"),
@@ -71,12 +73,10 @@ public class LoginController {
 
     private void showError(String message) {
         errorLabel.setText(message);
-        
-        // Barları kırmızı yap
+
         usernameField.setStyle("-fx-border-color: #ff4d4d; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;");
         passwordField.setStyle("-fx-border-color: #ff4d4d; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;");
 
-        // Titreme efekti
         TranslateTransition tt = new TranslateTransition(Duration.millis(50), loginBox);
         tt.setFromX(0);
         tt.setByX(10);

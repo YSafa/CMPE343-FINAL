@@ -171,6 +171,34 @@ public class CustomerController implements Initializable {
     }
 
     @FXML
+    private void handleRefresh() {
+        loadProducts();
+        Alertutil.showSuccessMessage("Product list refreshed successfully!");
+    }
+
+
+
+    @FXML
+    private void handleViewOrders()
+    {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/resources/CustomerOrdersView.fxml"));
+            Stage stage = new Stage();
+            stage.setTitle("My Orders");
+            stage.setScene(new Scene(loader.load()));
+            CustomerOrdersController controller = loader.getController();
+            controller.setCurrentUser(currentUser);
+            stage.show();
+        } catch (IOException e) {
+            Alertutil.showErrorMessage("Failed to open orders view: " + e.getMessage());
+        }
+    }
+
+
+
+
+
+    @FXML
     private void handleCompletePurchase() {
         if (cart.getItems().isEmpty()) {
             Alertutil.showWarningMessage("Your cart is empty.");
