@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import model.Order;
 import model.Product;
 import model.User;
+import util.Alertutil;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -82,62 +83,128 @@ public class OwnerController {
         updateSalesChart();
     }
 
-    @FXML
-private void handleLogout() {
-    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-    alert.setTitle("Logout Confirmation");
-    alert.setHeaderText("You are about to log out.");
-    alert.setContentText("Are you sure you want to exit to the login screen?");
-
-    Optional<ButtonType> result = alert.showAndWait();
-
-    if (result.isPresent() && result.get() == ButtonType.OK) {
-        try {
-            Parent loginRoot = FXMLLoader.load(getClass().getResource("/resources/Login.fxml"));
-            Stage currentStage = (Stage) tableProducts.getScene().getWindow();
-            
-            Scene loginScene = new Scene(loginRoot);
-            currentStage.setScene(loginScene);
-            currentStage.centerOnScreen();
-            currentStage.show();
-        } catch (IOException e) {
-            showError("Logout failed: " + e.getMessage());
-            e.printStackTrace();
-        }
+    private String formatProductName(String name) {
+        if (name == null || name.trim().isEmpty()) return "";
+        String trimmed = name.trim();
+        return trimmed.substring(0, 1).toUpperCase() + trimmed.substring(1).toLowerCase();
     }
-}
+
+    private boolean isInputValid() {
+        String name = txtProductName.getText();
+        String priceText = txtProductPrice.getText();
+        String stockText = txtProductStock.getText();
+        String thresholdText = txtProductThreshold.getText();
+
+        if (name == null || name.trim().isEmpty() || priceText.isEmpty() || stockText.isEmpty() || thresholdText.isEmpty()) {
+            Alertutil.showWarningMessage("All fields must be filled!");
+            return false;
+        }
+
+        if (!name.trim().matches("^[a-zA-ZÇŞĞÜÖİçşğüöı\\s]+$")) {
+            Alertutil.showWarningMessage("Product name must contain only letters!");
+            return false;
+        }
+
+        try {
+            double price = Double.parseDouble(priceText);
+            double stock = Double.parseDouble(stockText);
+            double threshold = Double.parseDouble(thresholdText);
+
+            if (price <= 0) {
+                Alertutil.showWarningMessage("Price must be greater than zero!");
+                return false;
+            }
+            if (stock < 0) {
+                Alertutil.showWarningMessage("Stock cannot be negative!");
+                return false;
+            }
+            if (threshold <= 0) {
+                Alertutil.showWarningMessage("Threshold must be greater than zero!");
+                return false;
+            }
+            
+            if (comboProductType.getValue() == null) {
+                Alertutil.showWarningMessage("Please select a product type!");
+                return false;
+            }
+
+        } catch (NumberFormatException e) {
+            Alertutil.showErrorMessage("Price, Stock and Threshold must be valid numbers!");
+            return false;
+        }
+
+        return true;
+    }
 
     @FXML
     private void handleAddProduct() {
-        try {
-            Product p = new Product(0, 
-                txtProductName.getText(), 
-                comboProductType.getValue(), 
-                Double.parseDouble(txtProductPrice.getText()), 
-                Double.parseDouble(txtProductStock.getText()), 
-                null, 
-                Double.parseDouble(txtProductThreshold.getText()));
-            
-            if(productDAO.addProduct(p)) {
+        if (!isInputValid()) return;
+
+        String formattedName = formatProductName(txtProductName.getText());
+        double price = Double.parseDouble(txtProductPrice.getText());
+        double stock = Double.parseDouble(txtProductStock.getText());
+        double threshold = Double.parseDouble(txtProductThreshold.getText());
+
+        if (showConfirm("Add Product", "Add " + formattedName + " to system?")) {
+            Product p = new Product(0, formattedName, comboProductType.getValue(), price, stock, null, threshold);
+            if (productDAO.addProduct(p)) {
                 refreshProductTable();
                 clearProductFields();
+                Alertutil.showSuccessMessage("Product added successfully.");
             }
-        } catch (Exception e) {
-            showError("Input Error! Please check numeric values for Price, Stock, and Threshold.");
         }
     }
 
     @FXML
     private void handleUpdateProduct() {
         Product selected = tableProducts.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            try {
-                selected.setStock(Double.parseDouble(txtProductStock.getText()));
-                productDAO.updateProduct(selected);
+        if (selected == null) {
+            Alertutil.showWarningMessage("Please select a product to update.");
+            return;
+        }
+
+        if (!isInputValid()) return;
+
+        String formattedName = formatProductName(txtProductName.getText());
+        String newType = comboProductType.getValue();
+        double newPrice = Double.parseDouble(txtProductPrice.getText());
+        double newStock = Double.parseDouble(txtProductStock.getText());
+        double newThreshold = Double.parseDouble(txtProductThreshold.getText());
+
+        if (showConfirm("Update Product", "Save all changes for " + selected.getName() + "?")) {
+            selected.setName(formattedName);
+            selected.setType(newType);
+            selected.setPrice(newPrice);
+            selected.setStock(newStock);
+            selected.setThreshold(newThreshold);
+
+            if (productDAO.updateProduct(selected)) {
                 refreshProductTable();
                 updateSalesChart();
-            } catch (Exception e) {
-                showError("Update failed. Ensure numeric fields are correct.");
+                Alertutil.showSuccessMessage("Product updated successfully.");
+            }
+        }
+    }
+
+    private boolean showConfirm(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        Optional<ButtonType> result = alert.showAndWait();
+        return result.isPresent() && result.get() == ButtonType.OK;
+    }
+
+    @FXML
+    private void handleLogout() {
+        if (showConfirm("Logout Confirmation", "Are you sure you want to log out?")) {
+            try {
+                Parent loginRoot = FXMLLoader.load(getClass().getResource("/resources/Login.fxml"));
+                Stage currentStage = (Stage) tableProducts.getScene().getWindow();
+                currentStage.setScene(new Scene(loginRoot));
+                currentStage.centerOnScreen();
+            } catch (IOException e) {
+                Alertutil.showErrorMessage("Logout failed: " + e.getMessage());
             }
         }
     }
@@ -145,18 +212,23 @@ private void handleLogout() {
     @FXML
     private void handleDeleteProduct() {
         Product selected = tableProducts.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            productDAO.deleteProduct(selected.getId());
-            refreshProductTable();
+        if (selected != null && showConfirm("Delete Product", "Delete " + selected.getName() + " permanently?")) {
+            if (productDAO.deleteProduct(selected.getId())) {
+                refreshProductTable();
+                updateSalesChart();
+                Alertutil.showSuccessMessage("Product deleted.");
+            }
         }
     }
 
     @FXML
     private void handleFireCarrier() {
         User selected = tableCarriers.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            userDAO.deleteUser(selected.getId());
-            refreshCarrierTable();
+        if (selected != null && showConfirm("Fire Carrier", "Terminate employment for " + selected.getUsername() + "?")) {
+            if (userDAO.deleteUser(selected.getId())) {
+                refreshCarrierTable();
+                Alertutil.showSuccessMessage("Carrier fired.");
+            }
         }
     }
 
@@ -176,12 +248,10 @@ private void handleLogout() {
         salesChart.getData().clear();
         XYChart.Series<String, Number> series = new XYChart.Series<>();
         series.setName("Revenue Analysis");
-        
         List<Order> orders = orderDAO.getAllOrders();
         double totalRevenue = 0;
-        for(Order o : orders) totalRevenue += o.getTotalCost();
-        
-        series.getData().add(new XYChart.Data<>("Total Revenue (TL)", totalRevenue));
+        for (Order o : orders) totalRevenue += o.getTotalCost();
+        series.getData().add(new XYChart.Data<>("Total Revenue", totalRevenue));
         salesChart.getData().add(series);
     }
 
@@ -190,13 +260,6 @@ private void handleLogout() {
         txtProductPrice.clear();
         txtProductStock.clear();
         txtProductThreshold.clear();
-    }
-
-    private void showError(String msg) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error"); 
-        alert.setHeaderText(null);
-        alert.setContentText(msg);
-        alert.showAndWait(); 
+        comboProductType.getSelectionModel().clearSelection();
     }
 }

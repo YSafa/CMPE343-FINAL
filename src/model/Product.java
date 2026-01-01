@@ -4,13 +4,12 @@ public class Product
 {
     private int id;
     private String name;
-    private String type; // enum('fruit','vegetable')
+    private String type;
     private double price;
-    private double stock; // Defined as double in DB
-    private byte[] image; // image stored as binary data (BLOB)
+    private double stock;
+    private byte[] image;
     private double threshold;
 
-    // Constructor matching database columns
     public Product(int id, String name, String type, double price, double stock, byte[] image, double threshold)
     {
         this.id = id;
@@ -22,25 +21,28 @@ public class Product
         this.threshold = threshold;
     }
 
-    // Getters
     public int getId() { return id; }
+    
     public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
     public String getType() { return type; }
-    // Product.java sınıfının içinde
-    public double getPrice()
-    {
-        // Proje Kuralı: Stok, eşik değerine (threshold) eşit veya altındaysa fiyat 2 katına çıkar.
+    public void setType(String type) { this.type = type; }
+
+    public double getPrice() {
         if (this.stock <= this.threshold) {
             return this.price * 2;
         }
-        // Stok yeterliyse normal fiyatı döndür.
         return this.price;
     }
-    public double getStock() { return stock; }
-    public byte[] getImage() { return image; }
-    public double getThreshold() { return threshold; }
+    public void setPrice(double price) { this.price = price; }
 
-    // Setter for stock (needed when updating inventory)
+    public double getStock() { return stock; }
     public void setStock(double stock) { this.stock = stock; }
+
+    public byte[] getImage() { return image; }
     public void setImage(byte[] image) { this.image = image; }
+
+    public double getThreshold() { return threshold; }
+    public void setThreshold(double threshold) { this.threshold = threshold; }
 }
