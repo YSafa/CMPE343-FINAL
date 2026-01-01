@@ -44,7 +44,7 @@ public class OwnerController {
     @FXML private TableView<Order> tableOrders;
     @FXML private TableColumn<Order, Integer> colOrderId;
     @FXML private TableColumn<Order, Timestamp> colOrderTime;
-    @FXML private TableColumn<Order, String> colOrderCustomer, colOrderCarrier, colOrderStatus;
+    @FXML private TableColumn<Order, String> colOrderCustomer, colOrderCarrier, colOrderStatus, colOrderContent;
     @FXML private TableColumn<Order, Double> colOrderTotal;
 
     @FXML private BarChart<String, Number> salesChart;
@@ -78,6 +78,7 @@ public class OwnerController {
         colOrderTotal.setCellValueFactory(new PropertyValueFactory<>("totalCost"));
         colOrderCustomer.setCellValueFactory(new PropertyValueFactory<>("customerName"));
         colOrderCarrier.setCellValueFactory(new PropertyValueFactory<>("carrierName"));
+        colOrderContent.setCellValueFactory(new PropertyValueFactory<>("products"));
         colOrderStatus.setCellValueFactory(cellData -> {
             boolean delivered = cellData.getValue().isDelivered();
             return new SimpleStringProperty(delivered ? "Delivered" : "Pending");

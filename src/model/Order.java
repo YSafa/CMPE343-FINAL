@@ -18,7 +18,7 @@ public class Order {
     public Order() {}
 
     public Order(int id, Timestamp orderTime, Timestamp deliveryTime, String products,
-                 int userId, int carrierId, boolean delivered, double totalCost, String invoiceContent) {
+                 int userId, int carrierId, boolean delivered, double totalCost, String extra) {
         this.id = id;
         this.orderTime = orderTime;
         this.deliveryTime = deliveryTime;
