@@ -14,6 +14,12 @@
         <Button onAction="#handleCancelOrder" style="-fx-background-color: #ff4d4d; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 16;" text="Cancel Selected Order" />
 
         <Button onAction="#handleClose" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 16;" text="Close" />
+        <Button onAction="#handleRateCarrier"
+                text="Rate Carrier"
+                style="-fx-background-color: #3498db;
+               -fx-text-fill: white;
+               -fx-font-weight: bold;" />
+
     </HBox>
 
     <!-- Başlık -->

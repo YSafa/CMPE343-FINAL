@@ -1,13 +1,20 @@
 package controller;
 
 import dao.OrderDAO;
-import javafx.collections.FXCollections;
+import dao.RatingDAO;
+
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
+import javafx.collections.FXCollections;
+import javafx.beans.property.SimpleStringProperty;
+
 import model.Order;
 import model.User;
 import util.Alertutil;
+
 
 public class CustomerOrdersController {
 
@@ -42,7 +49,14 @@ public class CustomerOrdersController {
             idColumn.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getId()));
             productsColumn.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getProducts()));
             orderTimeColumn.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getOrderTime().toString()));
-            deliveryTimeColumn.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getDeliveryTime().toString()));
+            deliveryTimeColumn.setCellValueFactory(c -> {
+                if (c.getValue().getDeliveryTime() == null)
+                    return new SimpleStringProperty("-");
+                return new SimpleStringProperty(
+                        c.getValue().getDeliveryTime().toString()
+                );
+            });
+
             statusColumn.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(getStatusText(c.getValue())));
             totalColumn.setCellValueFactory(c -> new javafx.beans.property.SimpleObjectProperty<>(c.getValue().getTotalCost()));
 
@@ -59,6 +73,68 @@ public class CustomerOrdersController {
         if (order.isDelivered()) return "Delivered ✅";
         if (order.getCarrierId() == 0) return "Pending ⏳";
         return "Assigned to Carrier 🚚";
+    }
+    @FXML
+    private void handleRateCarrier() {
+
+        Order selected = ordersTable.getSelectionModel().getSelectedItem();
+
+        if (selected == null) {
+            Alertutil.showWarningMessage("Please select an order.");
+            return;
+        }
+
+        // SADECE delivered siparişler
+        if (selected.isCancelled() || !selected.isDelivered()) {
+            Alertutil.showWarningMessage(
+                    "You can only rate delivered orders."
+            );
+            return;
+        }
+
+        // Carrier atanmış olmalı
+        if (selected.getCarrierId() == 0) {
+            Alertutil.showWarningMessage("Carrier not assigned.");
+            return;
+        }
+
+        RatingDAO ratingDAO = new RatingDAO();
+
+        // Daha önce puanlanmış mı?
+        if (ratingDAO.hasRatingForOrder(selected.getId())) {
+            Alertutil.showWarningMessage(
+                    "This order has already been rated."
+            );
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/resources/RateCarrierView.fxml")
+            );
+
+            Stage stage = new Stage();
+            stage.setTitle("Rate Carrier");
+            stage.setScene(new Scene(loader.load()));
+
+            RateCarrierController controller =
+                    loader.getController();
+
+            controller.init(
+                    currentUser.getId(),
+                    selected.getId(),
+                    selected.getCarrierId(),
+                    this::loadOrders // rating sonrası tabloyu yenile
+            );
+
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Alertutil.showErrorMessage(
+                    "Could not open rating window."
+            );
+        }
     }
 
     /**
