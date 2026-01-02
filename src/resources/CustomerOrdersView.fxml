@@ -19,6 +19,11 @@
                 style="-fx-background-color: #3498db;
                -fx-text-fill: white;
                -fx-font-weight: bold;" />
+        <Button onAction="#handleDownloadInvoice"
+                text="Download Invoice (PDF)"
+                style="-fx-background-color: #2ecc71;
+               -fx-text-fill: white;
+               -fx-font-weight: bold;" />
 
     </HBox>
 
