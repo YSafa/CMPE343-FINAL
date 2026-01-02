@@ -18,16 +18,42 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+
+/**
+ * This controller manages the login screen.
+ * It checks username and password from the database.
+ * If login is correct, it opens the correct dashboard by user role.
+ */
 public class LoginController {
 
+    /** Text field for username input. */
     @FXML private TextField usernameField;
+
+    /** Password field for password input. */
     @FXML private PasswordField passwordField;
+
+    /** Main box of the login form (used for shake animation). */
     @FXML private VBox loginBox;
+
+    /** Label used to show error messages to the user. */
     @FXML private Label errorLabel;
 
-    private final String defaultStyle = "-fx-border-color: #dcdcdc; -fx-border-radius: 10; -fx-background-radius: 10;";
-    private final String errorStyle = "-fx-border-color: #ff4d4d; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;";
+    /** Default style for input fields. */
+    private final String defaultStyle =
+            "-fx-border-color: #dcdcdc; -fx-border-radius: 10; -fx-background-radius: 10;";
 
+    /** Error style for input fields when login fails. */
+    private final String errorStyle =
+            "-fx-border-color: #ff4d4d; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;";
+
+    /**
+     * Called when the user clicks the Login button.
+     * It checks:
+     * - fields are not empty
+     * - user exists in database
+     * - password hash matches the stored password
+     * If login is successful, it opens the user dashboard.
+     */
     @FXML
     private void handleLogin() {
         String username = usernameField.getText().trim();
@@ -74,6 +100,13 @@ public class LoginController {
         }
     }
 
+
+    /**
+     * Shows an error message and adds a shake animation to the login box.
+     * It also applies error style to username and password fields.
+     *
+     * @param message the error message to show
+     */
     private void showError(String message) {
         errorLabel.setText(message);
         usernameField.setStyle(errorStyle);
@@ -87,12 +120,26 @@ public class LoginController {
         tt.play();
     }
 
+
+    /**
+     * Resets error label and input field styles to default.
+     * This is called before checking login.
+     */
     private void resetStyles() {
         errorLabel.setText("");
         usernameField.setStyle(defaultStyle);
         passwordField.setStyle(defaultStyle);
     }
 
+
+    /**
+     * Loads the dashboard screen for the given user.
+     * It selects an FXML file based on the user role:
+     * customer, carrier, or owner.
+     *
+     * @param user the logged-in user
+     * @throws Exception if FXML cannot be loaded
+     */
     private void loadDashboard(User user) throws Exception {
         Stage stage = (Stage) usernameField.getScene().getWindow();
         String fxml = "";
@@ -116,6 +163,10 @@ public class LoginController {
         stage.centerOnScreen();
     }
 
+    /**
+     * Opens the register screen when the user clicks Register.
+     * It loads Register.fxml and changes the scene.
+     */
     @FXML
     private void handleOpenRegister() {
         try {

@@ -6,8 +6,18 @@ import java.util.List;
 import java.util.ArrayList;
 
 
+/**
+ * Data Access Object for carrier ratings.
+ * It saves ratings and reads rating information.
+ */
 public class RatingDAO {
 
+    /**
+     * Checks if an order already has a rating.
+     *
+     * @param orderId order ID
+     * @return true if rating exists
+     */
     public boolean hasRatingForOrder(int orderId) {
         String sql = "SELECT 1 FROM carrier_ratings WHERE order_id = ?";
 
@@ -23,6 +33,13 @@ public class RatingDAO {
             return true;
         }
     }
+
+    /**
+     * Gets all comments for a carrier.
+     *
+     * @param carrierId carrier ID
+     * @return list of comments
+     */
     public List<String> getCommentsForCarrier(int carrierId) {
         List<String> comments = new ArrayList<>();
 
@@ -52,6 +69,16 @@ public class RatingDAO {
         return comments;
     }
 
+    /**
+     * Adds a new rating for a carrier.
+     *
+     * @param orderId order ID
+     * @param customerId customer ID
+     * @param carrierId carrier ID
+     * @param rating rating value
+     * @param comment optional comment
+     * @return true if rating is saved
+     */
     public boolean addRating(int orderId, int customerId, int carrierId,
                              int rating, String comment) {
 
@@ -78,6 +105,12 @@ public class RatingDAO {
         }
     }
 
+    /**
+     * Gets average rating of a carrier.
+     *
+     * @param carrierId carrier ID
+     * @return average rating value
+     */
     public double getAverageRatingForCarrier(int carrierId) {
         String sql = """
             SELECT AVG(rating)
@@ -101,6 +134,12 @@ public class RatingDAO {
         return 0.0;
     }
 
+    /**
+     * Gets total rating count of a carrier.
+     *
+     * @param carrierId carrier ID
+     * @return number of ratings
+     */
     public int getRatingCountForCarrier(int carrierId) {
         String sql = """
             SELECT COUNT(*)

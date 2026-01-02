@@ -31,31 +31,81 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.ResourceBundle;
 
+/**
+ * This controller manages the customer main screen.
+ * It loads products, shows them as cards, and lets the user add items to the cart.
+ * It also supports search, category filter, viewing cart/orders, and completing purchase.
+ */
 public class CustomerController implements Initializable {
 
+
+    /** FlowPane that holds product cards. */
     @FXML private FlowPane productsFlowPane;
+
+    /** Label that shows welcome text for the user. */
     @FXML private Label welcomeLabel;
+
+    /** Date picker for delivery date selection. */
     @FXML private DatePicker deliveryDatePicker;
+
+    /** ComboBox for selecting delivery hour (0-23). */
     @FXML private ComboBox<Integer> deliveryHourBox;
+
+    /** Text field used to search products by name or type. */
     @FXML private TextField searchField;
+
+    /** Buttons for category filters and completing purchase. */
     @FXML private Button btnAllProducts, btnVegetables, btnFruits, btnComplete;
 
+    /** Cart of the current customer session. */
     private final Cart cart = new Cart();
+
+    /** List of all available products from database. */
     private final ObservableList<Product> productList = FXCollections.observableArrayList();
+
+    /** Filtered view of product list (search + category). */
     private FilteredList<Product> filteredData;
+
+    /** Current logged-in user. */
     private User currentUser;
+
+    /** Active category filter name. */
     private String activeCategory = "All";
+
+    /** Minimum order amount required to place an order. */
     private static final double MIN_ORDER_AMOUNT = 200.0;
 
-    private final String activeStyle = "-fx-background-color: #2e7d32; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand;";
-    private final String inactiveStyle = "-fx-background-color: white; -fx-border-color: #2e7d32; -fx-border-radius: 10; -fx-text-fill: #2e7d32; -fx-font-weight: bold; -fx-cursor: hand;";
-    private final String pressedStyle = "-fx-background-color: #1b5e20; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10;";
+    /** Style used for selected category button. */
+    private final String activeStyle =
+            "-fx-background-color: #2e7d32; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand;";
 
+    /** Style used for non-selected category buttons. */
+    private final String inactiveStyle =
+            "-fx-background-color: white; -fx-border-color: #2e7d32; -fx-border-radius: 10; -fx-text-fill: #2e7d32; -fx-font-weight: bold; -fx-cursor: hand;";
+
+    /** Style used when a button is pressed. */
+    private final String pressedStyle =
+            "-fx-background-color: #1b5e20; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10;";
+
+
+    /**
+     * Sets the current user for this screen.
+     * It also updates the welcome label.
+     *
+     * @param user the logged-in user
+     */
     public void setCurrentUser(User user) {
         this.currentUser = user;
         welcomeLabel.setText("Welcome, " + user.getUsername());
     }
 
+    /**
+     * Initializes the screen when FXML is loaded.
+     * It prepares delivery UI, loads products, and starts search filtering.
+     *
+     * @param location URL location info (from JavaFX)
+     * @param resources resource bundle (from JavaFX)
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setupDeliveryUI();
@@ -68,6 +118,10 @@ public class CustomerController implements Initializable {
         addClickEffect(btnFruits);
     }
 
+    /**
+     * Sets delivery hour options and button styles for completing purchase.
+     * It fills the hour box with 0-23 and selects current hour.
+     */
     private void setupDeliveryUI() {
         for (int h = 0; h < 24; h++) deliveryHourBox.getItems().add(h);
         deliveryHourBox.getSelectionModel().select(LocalTime.now().getHour());
@@ -85,11 +139,21 @@ public class CustomerController implements Initializable {
         });
     }
 
+    /**
+     * Creates a filtered list for products.
+     * It listens to search text changes and applies filters.
+     */
     private void setupSearchFilter() {
         filteredData = new FilteredList<>(productList, p -> true);
         searchField.textProperty().addListener((observable, oldValue, newValue) -> applyFilters());
     }
 
+
+    /**
+     * Loads products from the database.
+     * It only loads products with stock > 0 and orders by name.
+     * After loading, it renders product cards.
+     */
     private void loadProducts() {
         String sql = "SELECT * FROM productinfo WHERE stock > 0 ORDER BY name ASC";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -109,6 +173,11 @@ public class CustomerController implements Initializable {
         }
     }
 
+
+    /**
+     * Applies search and category filters on the product list.
+     * It filters by product name/type and by active category.
+     */
     private void applyFilters() {
         String searchText = searchField.getText() == null ? "" : searchField.getText().toLowerCase();
         filteredData.setPredicate(product -> {
@@ -121,10 +190,38 @@ public class CustomerController implements Initializable {
         renderProductCards(filteredData);
     }
 
-    @FXML private void handleFilterAll() { activeCategory = "All"; updateCategoryStyles(btnAllProducts); applyFilters(); }
-    @FXML private void handleFilterVegetables() { activeCategory = "vegetable"; updateCategoryStyles(btnVegetables); applyFilters(); }
-    @FXML private void handleFilterFruits() { activeCategory = "fruit"; updateCategoryStyles(btnFruits); applyFilters(); }
+    /**
+     * Shows all products (removes category filter).
+     */
+    @FXML private void handleFilterAll() {
+        activeCategory = "All";
+        updateCategoryStyles(btnAllProducts);
+        applyFilters();
+    }
 
+    /**
+     * Shows only vegetable products.
+     */
+    @FXML private void handleFilterVegetables() {
+        activeCategory = "vegetable";
+        updateCategoryStyles(btnVegetables);
+        applyFilters();
+    }
+
+    /**
+     * Shows only fruit products.
+     */
+    @FXML private void handleFilterFruits() {
+        activeCategory = "fruit";
+        updateCategoryStyles(btnFruits);
+        applyFilters();
+    }
+
+    /**
+     * Updates button styles for category selection.
+     *
+     * @param selected the selected category button
+     */
     private void updateCategoryStyles(Button selected) {
         btnAllProducts.setStyle(inactiveStyle);
         btnVegetables.setStyle(inactiveStyle);
@@ -132,6 +229,11 @@ public class CustomerController implements Initializable {
         selected.setStyle(activeStyle);
     }
 
+    /**
+     * Adds a small press/release scale effect to a button.
+     *
+     * @param btn the button to style
+     */
     private void addClickEffect(Button btn) {
         btn.setOnMousePressed(e -> {
             btn.setScaleX(0.9);
@@ -143,6 +245,12 @@ public class CustomerController implements Initializable {
         });
     }
 
+    /**
+     * Creates and shows product cards in the FlowPane.
+     * Each card has image, name, price, stock, and an "ADD" button.
+     *
+     * @param products list of products to render
+     */
     private void renderProductCards(List<Product> products) {
         productsFlowPane.getChildren().clear();
         for (Product product : products) {
@@ -184,6 +292,14 @@ public class CustomerController implements Initializable {
         }
     }
 
+
+    /**
+     * Adds a product to the cart with the given quantity.
+     * It checks quantity is numeric, positive, and not more than stock.
+     *
+     * @param p the product to add
+     * @param q the text field that contains the quantity
+     */
     private void processAddToCart(Product p, TextField q) {
         try {
             double amount = Double.parseDouble(q.getText());
@@ -199,10 +315,37 @@ public class CustomerController implements Initializable {
         }
     }
 
-    @FXML private void handleViewCart() { openWindow("/resources/CartView.fxml", "Cart"); }
-    @FXML private void handleViewOrders() { openWindow("/resources/CustomerOrdersView.fxml", "My Orders"); }
-    @FXML private void handleRefresh() { loadProducts(); searchField.clear(); handleFilterAll(); }
+    /**
+     * Opens the cart window.
+     */
+    @FXML private void handleViewCart() {
+        openWindow("/resources/CartView.fxml", "Cart");
+    }
 
+    /**
+     * Opens the customer orders window.
+     */
+    @FXML private void handleViewOrders() {
+        openWindow("/resources/CustomerOrdersView.fxml", "My Orders");
+    }
+
+    /**
+     * Reloads products and resets search and filter.
+     */
+    @FXML private void handleRefresh() {
+        loadProducts();
+        searchField.clear();
+        handleFilterAll();
+    }
+
+
+    /**
+     * Opens a new window by loading an FXML file.
+     * If it is cart or orders window, it also sets needed data to controller.
+     *
+     * @param fxml  path of the FXML file
+     * @param title window title
+     */
     private void openWindow(String fxml, String title) {
         try {
             FXMLLoader l = new FXMLLoader(getClass().getResource(fxml));
@@ -213,6 +356,14 @@ public class CustomerController implements Initializable {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
+    /**
+     * Completes the purchase and places an order.
+     * It checks:
+     * - cart is not empty
+     * - total price is at least 200 TL
+     * - delivery date is selected
+     * Then it creates a delivery time and sends order to database.
+     */
     @FXML
     private void handleCompletePurchase() {
         if (cart.getItems().isEmpty() || cart.getTotalPrice() < MIN_ORDER_AMOUNT || deliveryDatePicker.getValue() == null) {
@@ -254,7 +405,10 @@ public class CustomerController implements Initializable {
     }
 
 
-
+    /**
+     * Logs out the current user and returns to login screen.
+     * It asks for confirmation before logout.
+     */
     @FXML private void handleLogout() {
         if (Alertutil.showConfirmation("Logout", "Are you sure you want to log out?")) {
             try {
@@ -267,6 +421,11 @@ public class CustomerController implements Initializable {
         }
     }
 
+
+    /**
+     * Opens the message window to send a message to the owner.
+     * It finds the owner user from database and sets both users in controller.
+     */
     @FXML
     private void handleMessageOwner() {
         try {
@@ -284,6 +443,13 @@ public class CustomerController implements Initializable {
         }
     }
 
+    /**
+     * Finds the owner user from the database.
+     * It searches userinfo table with role 'owner'.
+     *
+     * @return the owner user
+     * @throws Exception if database error happens
+     */
     private User findOwner() throws Exception {
         String sql = "SELECT * FROM userinfo WHERE role='owner' LIMIT 1";
         try (var c = DatabaseConnection.getConnection();

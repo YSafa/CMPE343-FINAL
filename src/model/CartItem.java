@@ -1,5 +1,9 @@
 package model;
 
+/**
+ * Represents one item in the shopping cart.
+ * It stores a product and its quantity.
+ */
 public class CartItem
 {
     private Product product;
@@ -7,6 +11,12 @@ public class CartItem
 
 
     // Constructor
+    /**
+     * Creates a cart item.
+     *
+     * @param product product in the cart
+     * @param quantity product quantity
+     */
     public CartItem(Product product, double quantity)
     {
         this.product = product;
@@ -14,12 +24,40 @@ public class CartItem
     }
 
     // Getters and Setters
-    public Product getProduct() {return product;}
+    /**
+     * Gets the product.
+     *
+     * @return product
+     */
+    public Product getProduct() {
+        return product;
+    }
 
-    public double getQuantity() { return quantity;}
+    /**
+     * Gets the quantity.
+     *
+     * @return quantity
+     */
+    public double getQuantity() {
+        return quantity;
+    }
 
-    public void setQuantity(double quantity) {this.quantity = quantity;}
+    /**
+     * Sets the quantity.
+     *
+     * @param quantity new quantity
+     */
+    public void setQuantity(double quantity) {
+        this.quantity = quantity;
+    }
 
-    // Calculates the total price for this item (Price * Quantity)
-    public double getTotalItemPrice() {return product.getPrice() * quantity;}
+    /**
+     * Calculates total price of this item.
+     * (price * quantity)
+     *
+     * @return total item price
+     */
+    public double getTotalItemPrice() {
+        return product.getPrice() * quantity;
+    }
 }

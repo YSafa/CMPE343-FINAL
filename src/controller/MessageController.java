@@ -14,15 +14,33 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 
 
+/**
+ * This controller manages the messaging screen.
+ * It shows messages between two users.
+ * Users can send and receive text messages.
+ */
 public class MessageController {
 
+    /** ListView that shows the message bubbles. */
     @FXML private ListView<String> messageList;
+
+    /** Text field where the user writes a message. */
     @FXML private TextField messageField;
 
+    /** The logged-in user. */
     private User currentUser;
+
+    /** The other user in the conversation. */
     private User partner;
+
+    /** DAO used to get and send messages from the database. */
     private final MessageDAO dao = new MessageDAO();
 
+    /**
+     * Initializes the message list UI.
+     * It creates message bubbles and aligns them left or right.
+     * It also allows sending message by pressing Enter.
+     */
     @FXML
     private void initialize() {
         messageList.setCellFactory(list -> new ListCell<>() {
@@ -73,13 +91,24 @@ public class MessageController {
         messageField.setOnAction(e -> handleSend());
     }
 
-
+    /**
+     * Sets the users in the conversation.
+     * It also loads previous messages.
+     *
+     * @param currentUser the logged-in user
+     * @param partner the other user
+     */
     public void setUsers(User currentUser, User partner) {
         this.currentUser = currentUser;
         this.partner = partner;
         loadMessages();
     }
 
+    /**
+     * Loads all messages between the two users.
+     * Messages are shown as "Me" or "Them".
+     * After loading, it scrolls to the last message.
+     */
     private void loadMessages() {
         var msgs = dao.getConversation(currentUser.getId(), partner.getId());
 
@@ -98,7 +127,10 @@ public class MessageController {
         }
     }
 
-
+    /**
+     * Sends a new message to the other user.
+     * It saves the message in the database and reloads the list.
+     */
     @FXML
     private void handleSend() {
         if (messageField.getText().isBlank()) return;

@@ -51,44 +51,65 @@ import java.io.File;
 import java.nio.file.Files;
 
 
-
+/**
+ * Controller for the owner screen.
+ * Owner can manage products, carriers, orders, coupons, and reports.
+ */
 public class OwnerController {
 
     // --- FXML UI Elements ---
+    /** Product table. */
     @FXML private TableView<Product> tableProducts;
+
+    /** Product columns. */
     @FXML private TableColumn<Product, Integer> colProdId;
     @FXML private TableColumn<Product, String> colProdName;
     @FXML private TableColumn<Product, Double> colProdPrice, colProdStock, colProdThreshold;
-    
+
+    /** Product input fields. */
     @FXML private TextField txtProductName, txtProductPrice, txtProductStock, txtProductThreshold;
+    /** Product type selection. */
     @FXML private ComboBox<String> comboProductType;
 
+    /** Carrier table. */
     @FXML private TableView<User> tableCarriers;
+
+    /** Carrier columns. */
     @FXML private TableColumn<User, Integer> colCarrId;
     @FXML private TableColumn<User, String> colCarrUser, colCarrAddress;
     @FXML private TableColumn<User, String> colCarrRating;
 
+    /** Carrier input fields. */
     @FXML private TextField txtCarrierUser, txtCarrierAddress;
+    /** Carrier password field. */
     @FXML private PasswordField txtCarrierPass;
 
+    /** Order table. */
     @FXML private TableView<Order> tableOrders;
+    /** Order columns. */
     @FXML private TableColumn<Order, Integer> colOrderId;
     @FXML private TableColumn<Order, Timestamp> colOrderTime;
     @FXML private TableColumn<Order, String> colOrderCustomer, colOrderCarrier, colOrderStatus, colOrderContent;
     @FXML private TableColumn<Order, Double> colOrderTotal;
 
+    /** Dashboard labels. */
     @FXML private Label lblTotalRevenue, lblTotalOrders, lblActiveCarriers;
+    /** Revenue chart. */
     @FXML private BarChart<String, Number> salesChart;
+    /** Status chart. */
     @FXML private PieChart statusPieChart; // YENİ EKLENDİ
+    /** Customer selector for messaging. */
     @FXML private ComboBox<User> customerBox;
 
-    //kupon için
+    /** Coupon table. */
     @FXML private TableView<Coupon> tableCoupons;
+    /** Coupon table. */
     @FXML private TableColumn<Coupon, Integer> colCouponId;
     @FXML private TableColumn<Coupon, String> colCouponCode, colCouponExpire;
     @FXML private TableColumn<Coupon, Double> colCouponRate;
     @FXML private TableColumn<Coupon, Boolean> colCouponActive;
 
+    /** Coupon input fields. */
     @FXML private TextField txtCouponCode, txtCouponRate, txtCouponDays, txtCouponMin;
 
     @FXML private javafx.scene.image.ImageView productImageView;
@@ -98,13 +119,17 @@ public class OwnerController {
 
 
 
-    // --- DAOs ---
+    /** DAO objects for database actions. */
     private ProductDAO productDAO = new ProductDAO();
     private UserDAO userDAO = new UserDAO();
     private OrderDAO orderDAO = new OrderDAO();
     private CouponDAO couponDAO = new CouponDAO();
     private RatingDAO ratingDAO = new RatingDAO();
 
+    /**
+     * Runs when the view is loaded.
+     * It sets columns and loads data.
+     */
     @FXML
     public void initialize() {
         loadCustomers();
@@ -160,6 +185,7 @@ public class OwnerController {
     }
 
 
+    /** Shows reviews for the selected carrier. */
     @FXML
     private void handleViewCarrierReviews() {
 
@@ -191,6 +217,7 @@ public class OwnerController {
         stage.show();
     }
 
+    /** Sets columns for product, carrier, and order tables. */
     private void setupTableColumns() {
         // Product Table
         colProdId.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -235,6 +262,7 @@ public class OwnerController {
         );
     }
 
+    /** Loads all tables and updates charts. */
     private void loadAllData() {
         refreshProductTable();
         refreshCarrierTable();
@@ -242,7 +270,7 @@ public class OwnerController {
         updateReports(); // Özet kartları ve grafikleri günceller
     }
 
-    // --- REPORT LOGIC (DASHBOARD) ---
+    /** Updates summary labels and charts. */
     private void updateReports() {
         List<Order> allOrders = orderDAO.getAllOrdersWithDetails();
         List<User> carriers = userDAO.getUsersByRole("carrier");
@@ -291,6 +319,7 @@ public class OwnerController {
     }
 
     // --- CARRIER ACTIONS ---
+    /** Adds a new carrier after validation and confirmation. */
     @FXML
     private void handleEmployCarrier() {
         String username = txtCarrierUser.getText().trim();
@@ -321,6 +350,7 @@ public class OwnerController {
         }
     }
 
+    /** Deletes the selected carrier after confirmation. */
     @FXML
     private void handleFireCarrier() {
         User selected = tableCarriers.getSelectionModel().getSelectedItem();
@@ -338,6 +368,7 @@ public class OwnerController {
     }
 
     // --- PRODUCT ACTIONS ---
+    /** Adds a new product after validation and confirmation. */
     @FXML
     private void handleAddProduct() {
         if (!isProductInputValid()) {
@@ -367,6 +398,7 @@ public class OwnerController {
         }
     }
 
+    /** Updates the selected product after validation and confirmation. */
     @FXML
     private void handleUpdateProduct() {
         Product selected = tableProducts.getSelectionModel().getSelectedItem();
@@ -392,6 +424,7 @@ public class OwnerController {
         }
     }
 
+    /** Deletes the selected product after confirmation. */
     @FXML
     private void handleDeleteProduct() {
         Product selected = tableProducts.getSelectionModel().getSelectedItem();
@@ -403,6 +436,7 @@ public class OwnerController {
         }
     }
 
+    /** Logs out and returns to the login screen. */
     @FXML
     private void handleLogout() {
         if (showConfirm("Logout", "Are you sure?")) {
@@ -418,16 +452,20 @@ public class OwnerController {
     }
 
     // --- HELPERS ---
+    /** Reloads product table from database. */
     private void refreshProductTable() {
         tableProducts.setItems(FXCollections.observableArrayList(productDAO.getAllProducts()));
     }
+    /** Reloads carrier table from database. */
     private void refreshCarrierTable() {
         tableCarriers.setItems(FXCollections.observableArrayList(userDAO.getUsersByRole("carrier")));
     }
+    /** Reloads order table from database. */
     private void refreshOrderTable() {
         tableOrders.setItems(FXCollections.observableArrayList(orderDAO.getAllOrdersWithDetails()));
     }
 
+    /** Checks product inputs are valid. */
     private boolean isProductInputValid() {
         try {
             if (txtProductName.getText().isEmpty() || comboProductType.getValue() == null) return false;
@@ -438,6 +476,7 @@ public class OwnerController {
         } catch (Exception e) { return false; }
     }
 
+    /** Shows a confirmation dialog and returns user choice. */
     private boolean showConfirm(String title, String msg) {
         Alert a = new Alert(Alert.AlertType.CONFIRMATION, msg, ButtonType.OK, ButtonType.CANCEL);
         a.setTitle(title);
@@ -446,6 +485,7 @@ public class OwnerController {
         return res.isPresent() && res.get() == ButtonType.OK;
     }
 
+    /** Clears product form fields. */
     private void clearProductFields() {
         txtProductName.clear(); txtProductPrice.clear(); txtProductStock.clear(); txtProductThreshold.clear();
         comboProductType.getSelectionModel().clearSelection();
@@ -453,10 +493,12 @@ public class OwnerController {
         imageInfoLabel.setText("Drag & drop image or choose.");
         selectedImageBytes = null;
     }
+    /** Clears carrier form fields. */
     private void clearCarrierFields() {
         txtCarrierUser.clear(); txtCarrierPass.clear(); txtCarrierAddress.clear();
     }
 
+    /** Opens the message window for owner and a customer. */
     @FXML
     private void handleOpenMessages() {
         try {
@@ -481,6 +523,7 @@ public class OwnerController {
     }
 
 
+    /** Finds the owner user in the database. */
     private User getCurrentOwner() throws Exception {
         String sql = "SELECT * FROM userinfo WHERE role='owner' LIMIT 1";
 
@@ -501,6 +544,7 @@ public class OwnerController {
         throw new RuntimeException("Owner not found");
     }
 
+    /** Finds one customer user in the database. */
     private User findFirstCustomer() throws Exception {
         String sql = "SELECT * FROM userinfo WHERE role='customer' LIMIT 1";
 
@@ -606,6 +650,7 @@ public class OwnerController {
     }
 
 
+    /** Loads customers into the ComboBox. */
     private void loadCustomers() {
         try {
             String sql = "SELECT * FROM userinfo WHERE role='customer'";
@@ -643,13 +688,25 @@ public class OwnerController {
         }
     }
 
-
+    /**
+     * Checks if the given file is an image file.
+     * It looks at the file name extension (.png, .jpg, .jpeg, .gif).
+     *
+     * @param f The file to check.
+     * @return true if the file is an image, false otherwise.
+     */
     private boolean isImageFile(File f) {
         String n = f.getName().toLowerCase();
         return n.endsWith(".png") || n.endsWith(".jpg")
                 || n.endsWith(".jpeg") || n.endsWith(".gif");
     }
 
+    /**
+     * Loads an image from a file and shows it in the ImageView.
+     * Also saves the image bytes for later use.
+     *
+     * @param file The image file to load.
+     */
     private void loadImageFromFile(File file) {
         try {
             Image img = new Image(file.toURI().toString());
@@ -663,6 +720,10 @@ public class OwnerController {
         }
     }
 
+    /**
+     * Opens a file chooser dialog for the user to select an image.
+     * If the user chooses a valid image file, it will be loaded and shown.
+     */
     @FXML
     private void handleChooseImage() {
         FileChooser fc = new FileChooser();

@@ -10,8 +10,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Utility class for creating invoice files.
+ * It generates a PDF invoice for an order.
+ */
 public class InvoiceUtil {
 
+    /**
+     * Creates a PDF invoice for the given order.
+     * The invoice file is saved to disk.
+     *
+     * @param order order information
+     * @return path of the created invoice file
+     * @throws Exception if file creation fails
+     */
     public static Path generateInvoice(Order order) throws Exception {
 
         // 📁 invoices klasörü

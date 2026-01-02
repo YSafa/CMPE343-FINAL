@@ -2,11 +2,18 @@ package util;
 
 import java.time.LocalDateTime;
 
+/**
+ * Utility class for date and time checks.
+ * It is used for delivery time validation.
+ */
 public class DateUtil {
 
     /**
-     * Seçilen teslimat tarihinin geçerli olup olmadığını kontrol eder.
-     * Kural: Sipariş anından itibaren en fazla 48 saat sonrası seçilebilir.
+     * Checks if the selected delivery time is valid.
+     * Delivery time must be within 48 hours from now.
+     *
+     * @param selectedTime selected delivery time
+     * @return true if delivery time is valid
      */
     public static boolean isDeliveryTimeValid(LocalDateTime selectedTime) {
         LocalDateTime now = LocalDateTime.now();

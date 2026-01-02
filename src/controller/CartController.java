@@ -13,42 +13,68 @@ import model.Coupon;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
+/**
+ * This controller manages the cart screen.
+ * It shows cart items in a table.
+ * It also calculates subtotal, VAT, total, and coupon discount.
+ */
 
 public class CartController {
 
+    /** Table that shows cart items. */
     @FXML
     private TableView<CartItem> cartTable;
 
+    /** Column for product name. */
     @FXML
     private TableColumn<CartItem, String> nameColumn;
 
+    /** Column for product quantity. */
     @FXML
     private TableColumn<CartItem, Double> quantityColumn;
 
+    /** Column for unit price of the product. */
     @FXML
     private TableColumn<CartItem, Double> unitPriceColumn;
 
+    /** Column for total price of one cart row (quantity * price). */
     @FXML
     private TableColumn<CartItem, Double> totalPriceColumn;
 
+    /** Label that shows the final total price. */
     @FXML
     private Label totalLabel;
 
+    /** Label that shows subtotal (without VAT). */
     @FXML
     private Label subtotalLabel;
+
+    /** Label that shows VAT amount. */
     @FXML
     private Label vatLabel;
 
+    /** Text field where user writes coupon code. */
     @FXML private TextField couponField;
+
+    /** Label that shows coupon status messages. */
     @FXML private Label couponMessage;
 
+    /** Cart object that holds selected items. */
     private Cart cart;
 
+    /** The coupon that is currently applied to the cart (can be null). */
     private Coupon appliedCoupon;
 
+    /** Observable list used by TableView to show cart items. */
     private final ObservableList<CartItem> cartItems =
             FXCollections.observableArrayList();
 
+    /**
+     * Sets the cart for this controller.
+     * It loads cart items into the table and updates totals.
+     *
+     * @param cart the cart to show in the UI
+     */
     public void setCart(Cart cart) {
         this.cart = cart;
 
@@ -58,6 +84,10 @@ public class CartController {
 
     }
 
+    /**
+     * Initializes the table columns.
+     * This method runs automatically when the FXML is loaded.
+     */
     @FXML
     private void initialize() {
         nameColumn.setCellValueFactory(data ->
@@ -82,7 +112,11 @@ public class CartController {
         cartTable.setItems(cartItems);
     }
 
-
+    /**
+     * Refreshes the table items and totals.
+     * If a coupon is applied but cart is below minimum value,
+     * it removes the coupon.
+     */
     private void refresh() {
         if (cart == null) return;
         cartItems.setAll(cart.getItems());
@@ -153,6 +187,10 @@ public class CartController {
     }
 
 
+    /**
+     * Closes the cart window.
+     * If a coupon is applied, it clears coupon fields before closing.
+     */
     @FXML
     private void handleClose() {
         if (appliedCoupon != null) {
@@ -165,6 +203,10 @@ public class CartController {
     }
 
 
+    /**
+     * Removes the selected item from the cart.
+     * If no item is selected, it shows an error message.
+     */
     @FXML
     private void handleRemove() {
 
@@ -184,6 +226,11 @@ public class CartController {
         updateTotals();
     }
 
+    /**
+     * Shows an error alert with a message.
+     *
+     * @param msg the error message to show
+     */
     private void showError(String msg) {
         Alert alert = new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK);
         alert.showAndWait();

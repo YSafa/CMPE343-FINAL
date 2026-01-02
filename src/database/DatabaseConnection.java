@@ -4,6 +4,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+/**
+ * Provides database connection.
+ * It is used to connect to the MySQL database.
+ */
 public class DatabaseConnection {
 
 
@@ -12,7 +16,9 @@ public class DatabaseConnection {
     private static final String PASSWORD = "1234";
 
     /**
-     * Creates and returns a database connection
+     * Creates and returns a database connection.
+     *
+     * @return database connection
      */
     public static Connection getConnection() {
         try {

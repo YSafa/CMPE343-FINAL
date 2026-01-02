@@ -8,10 +8,18 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object for products.
+ * It manages product data in the database.
+ */
 public class ProductDAO {
 
     /**
-     * Reduces the stock of a specific product after a sale.
+     * Reduces product stock after a sale.
+     *
+     * @param productId product ID
+     * @param quantitySold sold quantity
+     * @return true if update is successful
      */
     public boolean reduceStock(int productId, double quantitySold) {
         String sql = "UPDATE productinfo SET stock = stock - ? WHERE id = ?";
@@ -32,7 +40,9 @@ public class ProductDAO {
     }
 
     /**
-     * Fetches all products from the database.
+     * Gets all products from the database.
+     *
+     * @return list of products
      */
     public List<Product> getAllProducts() {
         List<Product> products = new ArrayList<>();
@@ -64,6 +74,9 @@ public class ProductDAO {
 
     /**
      * Adds a new product to the database.
+     *
+     * @param product product to add
+     * @return true if product is added
      */
     public boolean addProduct(Product product) {
         String sql = "INSERT INTO productinfo (name, type, price, stock, image, threshold) VALUES (?, ?, ?, ?, ?, ?)";
@@ -94,7 +107,11 @@ public class ProductDAO {
 
     /**
      * Updates an existing product.
+     *
+     * @param product product to update
+     * @return true if update is successful
      */
+
     public boolean updateProduct(Product product) {
 
         boolean hasImage = product.getImage() != null;
@@ -140,6 +157,9 @@ public class ProductDAO {
 
     /**
      * Deletes a product by ID.
+     *
+     * @param id product ID
+     * @return true if delete is successful
      */
     public boolean deleteProduct(int id) {
         String sql = "DELETE FROM productinfo WHERE id = ?";

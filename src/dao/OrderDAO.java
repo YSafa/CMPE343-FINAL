@@ -7,8 +7,23 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class is responsible for managing order data in the database.
+ * It includes functions to create, update, cancel, and get orders.
+ * All database actions are done using JDBC.
+ */
 public class OrderDAO {
 
+    /**
+     * Place a new order and use a transaction for safety.
+     * If there is a coupon code, it will be marked as used.
+     *
+     * @param user The user who makes the order.
+     * @param cart The shopping cart of the user.
+     * @param deliveryTime The expected delivery time.
+     * @param usedCouponCode The coupon code if the user used one.
+     * @return true if the order was placed successfully, false if there was an error.
+     */
     public boolean placeOrderWithTransaction(User user, Cart cart, LocalDateTime deliveryTime, String usedCouponCode) {
         String insertOrder = "INSERT INTO orderinfo (user_id, total_cost, products, order_time, delivery_time, used_coupon_code) VALUES (?, ?, ?, NOW(), ?, ?)";
         Connection conn = null;
@@ -20,7 +35,6 @@ public class OrderDAO {
             double total = cart.getTotalPrice();
             String products = cart.getCartContentAsString();
 
-
             PreparedStatement stmt = conn.prepareStatement(insertOrder);
             stmt.setInt(1, user.getId());
             stmt.setDouble(2, total);
@@ -29,7 +43,7 @@ public class OrderDAO {
             stmt.setString(5, usedCouponCode);
             stmt.executeUpdate();
 
-            // 🔹 Kuponu pasif hale getir (kullanılmış say)
+            // Mark coupon as used if available
             if (usedCouponCode != null && !usedCouponCode.isEmpty()) {
                 new CouponDAO().markAsUsed(usedCouponCode);
             }
@@ -45,18 +59,24 @@ public class OrderDAO {
         }
         return false;
     }
-    public Order getOrderWithDetails(int orderId) {
 
+    /**
+     * Get one order with all details (customer and carrier info).
+     *
+     * @param orderId The ID of the order.
+     * @return An Order object with details, or null if not found.
+     */
+    public Order getOrderWithDetails(int orderId) {
         String sql = """
-        SELECT o.*,
-               u.username AS customerName,
-               u.address AS customerAddress,
-               c.username AS carrierName
-        FROM orderinfo o
-        JOIN userinfo u ON o.user_id = u.id
-        LEFT JOIN userinfo c ON o.carrier_id = c.id
-        WHERE o.id = ?
-    """;
+            SELECT o.*,
+                   u.username AS customerName,
+                   u.address AS customerAddress,
+                   c.username AS carrierName
+            FROM orderinfo o
+            JOIN userinfo u ON o.user_id = u.id
+            LEFT JOIN userinfo c ON o.carrier_id = c.id
+            WHERE o.id = ?
+        """;
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -80,19 +100,35 @@ public class OrderDAO {
                 o.setCancelled(rs.getBoolean("iscancelled"));
                 o.setCustomerName(rs.getString("customerName"));
                 o.setCustomerAddress(rs.getString("customerAddress"));
+                o.setCarrierName(rs.getString("carrierName"));
+                return o;
+            }
 
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
-
-                public List<Order> getAllOrdersWithDetails() {
+    /**
+     * Get all orders with customer and carrier information.
+     *
+     * @return A list of all orders with details.
+     */
+    public List<Order> getAllOrdersWithDetails() {
         List<Order> orders = new ArrayList<>();
-        String sql = "SELECT o.*, u.username AS customerName, c.username AS carrierName " +
-                "FROM orderinfo o " +
-                "JOIN userinfo u ON o.user_id = u.id " +
-                "LEFT JOIN userinfo c ON o.carrier_id = c.id " +
-                "ORDER BY o.ordertime DESC";
+        String sql = """
+            SELECT o.*, u.username AS customerName, c.username AS carrierName
+            FROM orderinfo o
+            JOIN userinfo u ON o.user_id = u.id
+            LEFT JOIN userinfo c ON o.carrier_id = c.id
+            ORDER BY o.ordertime DESC
+        """;
+
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
+
             while (rs.next()) {
                 Order o = new Order(
                         rs.getInt("id"),
@@ -106,32 +142,36 @@ public class OrderDAO {
                         ""
                 );
 
-                // 🔹 Eksik olan satır (bunu ekle):
                 o.setCancelled(rs.getBoolean("iscancelled"));
-
                 o.setCustomerName(rs.getString("customerName"));
                 o.setCarrierName(rs.getString("carrierName") != null ? rs.getString("carrierName") : "Not Assigned");
                 orders.add(o);
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return orders;
     }
 
-
-
+    /**
+     * Get all orders that do not have a carrier assigned yet.
+     *
+     * @return A list of unassigned orders with customer info.
+     */
     public List<Order> getUnassignedOrdersWithCustomerInfo() {
         List<Order> orders = new ArrayList<>();
         String sql = """
-        SELECT o.*, u.username AS customerName, u.address AS customerAddress
-        FROM orderinfo o
-        JOIN userinfo u ON o.user_id = u.id
-        WHERE o.isdelivered = 0 
-          AND o.carrier_id = 0 
-          AND o.iscancelled = 0
-        ORDER BY o.deliverytime ASC
-    """;
+            SELECT o.*, u.username AS customerName, u.address AS customerAddress
+            FROM orderinfo o
+            JOIN userinfo u ON o.user_id = u.id
+            WHERE o.isdelivered = 0 
+              AND o.carrier_id = 0 
+              AND o.iscancelled = 0
+            ORDER BY o.deliverytime ASC
+        """;
+
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -150,17 +190,23 @@ public class OrderDAO {
                 );
 
                 o.setCancelled(rs.getBoolean("iscancelled"));
-
                 o.setCustomerName(rs.getString("customerName"));
                 o.setCustomerAddress(rs.getString("customerAddress"));
                 orders.add(o);
             }
 
         } catch (SQLException e) { e.printStackTrace(); }
+
         return orders;
     }
 
-
+    /**
+     * Give (assign) one order to a carrier.
+     *
+     * @param orderId The ID of the order.
+     * @param carrierId The ID of the carrier.
+     * @return true if the order was assigned, false otherwise.
+     */
     public boolean assignOrderToCarrier(int orderId, int carrierId) {
         String sql = "UPDATE orderinfo SET carrier_id = ? WHERE id = ? AND carrier_id = 0 AND isdelivered = 0";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -168,21 +214,30 @@ public class OrderDAO {
             stmt.setInt(1, carrierId);
             stmt.setInt(2, orderId);
             return stmt.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); return false; }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
-
+    /**
+     * Get all active (not delivered) orders for a specific carrier.
+     *
+     * @param carrierId The ID of the carrier.
+     * @return A list of assigned but not yet delivered orders.
+     */
     public List<Order> getAssignedOrdersForCarrier(int carrierId) {
         List<Order> orders = new ArrayList<>();
         String sql = """
-        SELECT o.*, u.username AS customerName, u.address AS customerAddress
-        FROM orderinfo o
-        JOIN userinfo u ON o.user_id = u.id
-        WHERE o.isdelivered = 0 
-          AND o.iscancelled = 0
-          AND o.carrier_id = ?
-        ORDER BY o.deliverytime ASC
-    """;
+            SELECT o.*, u.username AS customerName, u.address AS customerAddress
+            FROM orderinfo o
+            JOIN userinfo u ON o.user_id = u.id
+            WHERE o.isdelivered = 0 
+              AND o.iscancelled = 0
+              AND o.carrier_id = ?
+            ORDER BY o.deliverytime ASC
+        """;
+
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, carrierId);
@@ -205,10 +260,18 @@ public class OrderDAO {
                 }
             }
         } catch (SQLException e) { e.printStackTrace(); }
+
         return orders;
     }
 
-
+    /**
+     * Mark an order as delivered by a carrier.
+     *
+     * @param orderId The order ID.
+     * @param carrierId The carrier ID.
+     * @param deliveredTime The delivery time.
+     * @return true if updated successfully, false otherwise.
+     */
     public boolean completeDelivery(int orderId, int carrierId, LocalDateTime deliveredTime) {
         String sql = "UPDATE orderinfo SET isdelivered = 1, deliverytime = ? WHERE id = ? AND carrier_id = ? AND isdelivered = 0";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -220,27 +283,48 @@ public class OrderDAO {
         } catch (SQLException e) { e.printStackTrace(); return false; }
     }
 
+    /**
+     * Get all orders that were delivered by a specific carrier.
+     *
+     * @param carrierId The carrier ID.
+     * @return A list of delivered orders.
+     */
     public List<Order> getDeliveredOrdersForCarrier(int carrierId) {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT o.*, u.username AS customerName, u.address AS customerAddress FROM orderinfo o JOIN userinfo u ON o.user_id = u.id WHERE o.isdelivered = 1 AND o.carrier_id = ? ORDER BY o.deliverytime DESC";
+
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, carrierId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    Order o = new Order(rs.getInt("id"), rs.getTimestamp("ordertime"), rs.getTimestamp("deliverytime"), rs.getString("products"), rs.getInt("user_id"), rs.getInt("carrier_id"), rs.getBoolean("isdelivered"), rs.getDouble("totalcost"), "");
+                    Order o = new Order(
+                            rs.getInt("id"),
+                            rs.getTimestamp("ordertime"),
+                            rs.getTimestamp("deliverytime"),
+                            rs.getString("products"),
+                            rs.getInt("user_id"),
+                            rs.getInt("carrier_id"),
+                            rs.getBoolean("isdelivered"),
+                            rs.getDouble("totalcost"),
+                            ""
+                    );
                     o.setCustomerName(rs.getString("customerName"));
                     o.setCustomerAddress(rs.getString("customerAddress"));
                     orders.add(o);
                 }
             }
         } catch (SQLException e) { e.printStackTrace(); }
+
         return orders;
     }
 
     /**
-     * Cancels an order (sets iscancelled = TRUE)
-     * Only works if the order is NOT delivered and NOT assigned to a carrier.
+     * Cancel an order if it is not delivered and not assigned.
+     * Also returns product quantities back to stock.
+     *
+     * @param orderId The order ID to cancel.
+     * @return true if cancelled, false otherwise.
      */
     public boolean cancelOrder(int orderId) {
         String getProductsSQL = "SELECT products FROM orderinfo WHERE id = ? AND isdelivered = 0 AND iscancelled = 0 AND carrier_id = 0";
@@ -257,7 +341,6 @@ public class OrderDAO {
 
             String productsString = null;
 
-            // Ürün listesini çek
             try (PreparedStatement stmt = conn.prepareStatement(getProductsSQL)) {
                 stmt.setInt(1, orderId);
                 try (ResultSet rs = stmt.executeQuery()) {
@@ -267,21 +350,17 @@ public class OrderDAO {
                 }
             }
 
-            // Sipariş bulunamadıysa çık
             if (productsString == null || productsString.isEmpty()) {
                 conn.rollback();
                 return false;
             }
 
-            // Ürünleri parse et (örnek format: "Apple x 2.0; Banana x 1.5;")
             String[] items = productsString.split(";");
             try (PreparedStatement updateStockStmt = conn.prepareStatement(updateStockSQL)) {
                 for (String item : items) {
                     item = item.trim();
-                    if (item.isEmpty()) continue;
-                    if (!item.contains("x")) continue;
+                    if (item.isEmpty() || !item.contains("x")) continue;
 
-                    // "Apple x 2.0" -> name=Apple, quantity=2.0
                     String[] parts = item.split("x");
                     if (parts.length == 2) {
                         String name = parts[0].trim();
@@ -297,7 +376,6 @@ public class OrderDAO {
                 }
             }
 
-            // Siparişi iptal et
             try (PreparedStatement cancelStmt = conn.prepareStatement(cancelOrderSQL)) {
                 cancelStmt.setInt(1, orderId);
                 cancelStmt.executeUpdate();
@@ -320,14 +398,13 @@ public class OrderDAO {
         }
     }
 
-
-
-
     /**
-     * Returns all orders belonging to a specific customer (by user_id)
+     * Get all orders of a specific user.
+     *
+     * @param userId The user ID.
+     * @return A list of the user's orders.
      */
-    public List<Order> getOrdersByUser(int userId)
-    {
+    public List<Order> getOrdersByUser(int userId) {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT * FROM orderinfo WHERE user_id = ? ORDER BY ordertime DESC";
 
@@ -354,9 +431,7 @@ public class OrderDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return orders;
     }
-
-
-
 }

@@ -12,13 +12,23 @@ public class Cart {
     private List<CartItem> items;
     private Coupon appliedCoupon; // Kupon bilgisi
 
+    /** VAT rate (18%). */
     private static final double VAT_RATE = 0.18;
 
+    /**
+     * Creates an empty cart.
+     */
     public Cart() {
         this.items = new ArrayList<>();
     }
 
-    /** Adds a product to the cart or increases quantity if it already exists. */
+    /**
+     * Adds a product to the cart.
+     * If product exists, quantity is increased.
+     *
+     * @param product product to add
+     * @param quantity product quantity
+     */
     public void addItem(Product product, double quantity) {
         boolean isFound = false;
         for (CartItem item : items) {
@@ -33,7 +43,11 @@ public class Cart {
         }
     }
 
-    /** Removes a product completely from the cart. */
+    /**
+     * Removes a product from the cart.
+     *
+     * @param product product to remove
+     */
     public void removeItem(Product product) {
         items.removeIf(item -> item.getProduct().getId() == product.getId());
     }
@@ -44,7 +58,11 @@ public class Cart {
         appliedCoupon = null; // 🧾 Kuponu da sıfırla
     }
 
-    /** Returns all cart items. */
+    /**
+     * Gets all cart items.
+     *
+     * @return list of cart items
+     */
     public List<CartItem> getItems() {
         return items;
     }
@@ -58,12 +76,21 @@ public class Cart {
         return total;
     }
 
-    /** Calculates total price including VAT. */
+    /**
+     * Calculates total price without VAT.
+     *
+     * @return total price
+     */
     public double getTotalPriceWithVAT() {
         return getTotalPrice() * (1 + VAT_RATE);
     }
 
-    /** Converts cart contents into a string for saving in database. */
+    /**
+     * Converts cart items to a single string.
+     * This is used for saving to database.
+     *
+     * @return cart content as string
+     */
     public String getCartContentAsString() {
         StringBuilder sb = new StringBuilder();
         for (CartItem item : items) {
@@ -75,11 +102,20 @@ public class Cart {
         return sb.toString();
     }
 
-    // Kupon get/set metotları
+    /**
+     * Gets the applied coupon.
+     *
+     * @return applied coupon
+     */
     public Coupon getAppliedCoupon() {
         return appliedCoupon;
     }
 
+    /**
+     * Sets a coupon for the cart.
+     *
+     * @param coupon coupon to apply
+     */
     public void setAppliedCoupon(Coupon coupon) {
         this.appliedCoupon = coupon;
     }

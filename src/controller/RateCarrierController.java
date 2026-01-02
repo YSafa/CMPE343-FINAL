@@ -7,16 +7,37 @@ import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 import util.Alertutil;
 
+/**
+ * Controller for rating a carrier.
+ * Customer can give a score and a comment.
+ */
 public class RateCarrierController {
 
+    /** ComboBox for rating value (1–5). */
     @FXML private ComboBox<Integer> ratingBox;
+    /** Text area for optional comment. */
     @FXML private TextArea commentArea;
 
+    /** Customer ID. */
     private int customerId;
+
+    /** Order ID. */
     private int orderId;
+
+    /** Carrier ID. */
     private int carrierId;
+
+    /** Action to run after successful rating. */
     private Runnable onSuccessRefresh;
 
+    /**
+     * Initializes required data for rating.
+     *
+     * @param customerId customer ID
+     * @param orderId order ID
+     * @param carrierId carrier ID
+     * @param onSuccessRefresh action after success
+     */
     public void init(int customerId,
                      int orderId,
                      int carrierId,
@@ -27,6 +48,10 @@ public class RateCarrierController {
         this.onSuccessRefresh = onSuccessRefresh;
     }
 
+    /**
+     * Runs when the view is loaded.
+     * It fills rating values from 1 to 5.
+     */
     @FXML
     public void initialize() {
         for (int i = 1; i <= 5; i++) {
@@ -35,6 +60,10 @@ public class RateCarrierController {
         ratingBox.getSelectionModel().select(5);
     }
 
+    /**
+     * Submits the rating and comment.
+     * It saves data to the database.
+     */
     @FXML
     private void handleSubmit() {
 
@@ -69,6 +98,9 @@ public class RateCarrierController {
         }
     }
 
+    /**
+     * Closes the rating window.
+     */
     @FXML
     private void handleClose() {
         Stage s =

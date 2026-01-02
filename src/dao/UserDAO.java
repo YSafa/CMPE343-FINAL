@@ -10,8 +10,19 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data Access Object for users.
+ * It manages user data in the database.
+ */
 public class UserDAO {
 
+    /**
+     * Adds a new user to the database.
+     *
+     * @param user user to add
+     * @return true if user is added
+     * @throws Exception if database error happens
+     */
     public boolean addUser(User user) throws SQLException {
         String sql = "INSERT INTO userinfo (username, password, role, address) VALUES (?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -26,10 +37,23 @@ public class UserDAO {
         }
     }
 
+    /**
+     * Registers a new customer.
+     *
+     * @param user customer user
+     * @return true if registration is successful
+     * @throws Exception if database error happens
+     */
     public boolean registerCustomer(User user) throws SQLException {
         return addUser(user);
     }
 
+    /**
+     * Checks if a username already exists.
+     *
+     * @param username username to check
+     * @return true if username is taken
+     */
     public boolean isUsernameTaken(String username) {
         String sql = "SELECT id FROM userinfo WHERE username = ?";
         try (Connection conn = DatabaseConnection.getConnection();
@@ -43,6 +67,12 @@ public class UserDAO {
         }
     }
 
+    /**
+     * Gets all users with a specific role.
+     *
+     * @param role user role (customer, carrier, owner)
+     * @return list of users
+     */
     public List<User> getUsersByRole(String role) {
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM userinfo WHERE role = ?";
@@ -63,6 +93,12 @@ public class UserDAO {
         return users;
     }
 
+    /**
+     * Deletes a user by ID.
+     *
+     * @param id user ID
+     * @return true if delete is successful
+     */
     public boolean deleteUser(int id) {
         String sql = "DELETE FROM userinfo WHERE id = ?";
         try (Connection conn = DatabaseConnection.getConnection();

@@ -10,10 +10,19 @@ import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import util.Alertutil;
 
-import java.util.Optional;
 
+/**
+ * This class is the main application class.
+ * It starts the JavaFX application.
+ * The program runs from this class.
+ */
 public class Group29 extends Application {
-
+    /**
+     * This method starts the JavaFX application.
+     * It loads the Login.fxml file and shows the main window.
+     *
+     * @param stage the main stage of the application
+     */
     @Override
     public void start(Stage stage) {
         try {
@@ -41,6 +50,12 @@ public class Group29 extends Application {
         }
     }
 
+    /**
+     * This method shows a confirmation alert before closing the application.
+     * If the user confirms, the application will close.
+     *
+     * @param stage the main stage of the application
+     */
     private void showExitConfirmation(Stage stage) {
     boolean confirmed = Alertutil.showConfirmation(
         "Exit Application",
@@ -53,6 +68,12 @@ public class Group29 extends Application {
     }
 }
 
+    /**
+     * The main method of the program.
+     * It launches the JavaFX application.
+     *
+     * @param args command line arguments
+     */
     public static void main(String[] args) {
         launch(args);
     }

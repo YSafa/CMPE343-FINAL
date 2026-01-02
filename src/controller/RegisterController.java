@@ -15,28 +15,42 @@ import util.Alertutil;
 import util.PasswordUtil;
 import java.sql.SQLException;
 
+/**
+ * Controller for the register screen.
+ * It creates a new customer account after validation.
+ */
 public class RegisterController {
 
-    @FXML
-    private TextField usernameField;
+    /** Username input field. */
+    @FXML private TextField usernameField;
 
-    @FXML
-    private PasswordField passwordField;
+    /** Password input field. */
+    @FXML private PasswordField passwordField;
 
-    @FXML
-    private PasswordField confirmPasswordField;
+    /** Confirm password input field. */
+    @FXML private PasswordField confirmPasswordField;
 
-    @FXML
-    private TextField addressField;
+    /** Address input field. */
+    @FXML private TextField addressField;
 
-    @FXML
-    private Label errorLabel;
+    /** Label for showing errors. */
+    @FXML private Label errorLabel;
 
+    /** DAO for user database actions. */
     private final UserDAO userDAO = new UserDAO();
 
-    private final String defaultStyle = "-fx-border-color: #dcdcdc; -fx-border-radius: 10; -fx-background-radius: 10;";
-    private final String errorStyle = "-fx-border-color: #ff4d4d; -fx-border-width: 2px; -fx-border-radius: 10; -fx-background-radius: 10;";
+    /** Default style for input fields. */
+    private final String defaultStyle =
+            "-fx-border-color: #dcdcdc; -fx-border-radius: 10; -fx-background-radius: 10;";
 
+    /** Error style for input fields. */
+    private final String errorStyle =
+            "-fx-border-color: #ff4d4d; -fx-border-width: 2px; -fx-border-radius: 10; -fx-background-radius: 10;";
+
+    /**
+     * Called when the user clicks Register.
+     * It validates inputs and saves the new customer in the database.
+     */
     @FXML
     private void handleRegister() {
         resetStyles();
@@ -92,10 +106,18 @@ public class RegisterController {
         }
     }
 
+    /**
+     * Marks a field with error style.
+     *
+     * @param field the UI control to mark
+     */
     private void markAsError(Control field) {
         field.setStyle(errorStyle);
     }
 
+    /**
+     * Resets styles and clears the error message.
+     */
     private void resetStyles() {
         usernameField.setStyle(defaultStyle);
         passwordField.setStyle(defaultStyle);
@@ -104,11 +126,18 @@ public class RegisterController {
         errorLabel.setText("");
     }
 
+    /**
+     * Called when user clicks Back.
+     * It returns to the login screen.
+     */
     @FXML
     private void handleBack() {
         goBackToLogin();
     }
 
+    /**
+     * Loads the login screen (Login.fxml).
+     */
     private void goBackToLogin() {
         try {
             Stage stage = (Stage) usernameField.getScene().getWindow();
