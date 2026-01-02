@@ -10,6 +10,9 @@ public class Product
     private byte[] image;
     private double threshold;
 
+    private byte[] imageBytes;
+
+
     public Product(int id, String name, String type, double price, double stock, byte[] image, double threshold)
     {
         this.id = id;
@@ -28,6 +31,9 @@ public class Product
 
     public String getType() { return type; }
     public void setType(String type) { this.type = type; }
+
+    public byte[] getImageBytes() { return imageBytes; }
+    public void setImageBytes(byte[] imageBytes) { this.imageBytes = imageBytes; }
 
     public double getPrice() {
         if (this.stock <= this.threshold) {

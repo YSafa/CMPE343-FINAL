@@ -68,7 +68,6 @@ public class CustomerOrdersController {
     }
     @FXML
     private void handleDownloadInvoice() {
-
         Order selected = ordersTable.getSelectionModel().getSelectedItem();
 
         if (selected == null) {
@@ -84,14 +83,15 @@ public class CustomerOrdersController {
         }
 
         try {
-            Path invoice = InvoiceUtil.generateInvoice(selected);
+            String filePath = "invoice_" + selected.getId() + ".pdf";
+
+            InvoiceUtil.generateInvoice(selected, filePath);
 
             Alertutil.showSuccessMessage(
-                    "Invoice generated:\n" + invoice.toAbsolutePath()
+                    "Invoice generated:\n" + filePath
             );
 
-            // Otomatik açmak istersen:
-            Desktop.getDesktop().open(invoice.toFile());
+            java.awt.Desktop.getDesktop().open(new java.io.File(filePath));
 
         } catch (Exception e) {
             e.printStackTrace();

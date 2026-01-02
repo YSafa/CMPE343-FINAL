@@ -41,6 +41,16 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import model.User;
 
+import javafx.scene.image.Image;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.TransferMode;
+import javafx.stage.FileChooser;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.nio.file.Files;
+
+
 
 public class OwnerController {
 
@@ -81,6 +91,12 @@ public class OwnerController {
 
     @FXML private TextField txtCouponCode, txtCouponRate, txtCouponDays, txtCouponMin;
 
+    @FXML private javafx.scene.image.ImageView productImageView;
+    @FXML private Label imageInfoLabel;
+
+    private byte[] selectedImageBytes; // seçilen / mevcut resim
+
+
 
     // --- DAOs ---
     private ProductDAO productDAO = new ProductDAO();
@@ -99,7 +115,50 @@ public class OwnerController {
         if (comboProductType != null) {
             comboProductType.setItems(FXCollections.observableArrayList("vegetable", "fruit"));
         }
+
+        productImageView.setOnDragOver(e -> {
+            Dragboard db = e.getDragboard();
+            if (db.hasFiles() && isImageFile(db.getFiles().get(0))) {
+                e.acceptTransferModes(TransferMode.COPY);
+            }
+            e.consume();
+        });
+
+        productImageView.setOnDragDropped(e -> {
+            Dragboard db = e.getDragboard();
+            if (db.hasFiles()) {
+                File f = db.getFiles().get(0);
+                if (isImageFile(f)) {
+                    loadImageFromFile(f);
+                } else {
+                    imageInfoLabel.setText("Please drop an image file.");
+                }
+            }
+            e.setDropCompleted(true);
+            e.consume();
+        });
+
+        tableProducts.getSelectionModel().selectedItemProperty().addListener((obs, oldP, newP) -> {
+            if (newP == null) return;
+
+            txtProductName.setText(newP.getName());
+            txtProductPrice.setText(String.valueOf(newP.getPrice()));
+            txtProductStock.setText(String.valueOf(newP.getStock()));
+            txtProductThreshold.setText(String.valueOf(newP.getThreshold()));
+            comboProductType.setValue(newP.getType());
+
+            byte[] img = newP.getImage();
+            if (img != null && img.length > 0) {
+                productImageView.setImage(new Image(new ByteArrayInputStream(img)));
+                selectedImageBytes = img;
+            } else {
+                productImageView.setImage(null);
+                selectedImageBytes = null;
+            }
+        });
+
     }
+
 
     @FXML
     private void handleViewCarrierReviews() {
@@ -291,7 +350,15 @@ public class OwnerController {
         double threshold = Double.parseDouble(txtProductThreshold.getText());
 
         if (showConfirm("Add Product", "Add " + name + " to system?")) {
-            Product p = new Product(0, name, comboProductType.getValue(), price, stock, null, threshold);
+            Product p = new Product(
+                    0,
+                    name,
+                    comboProductType.getValue(),
+                    price,
+                    stock,
+                    selectedImageBytes,
+                    threshold
+            );
             if (productDAO.addProduct(p)) {
                 refreshProductTable();
                 clearProductFields();
@@ -315,6 +382,8 @@ public class OwnerController {
             selected.setStock(Double.parseDouble(txtProductStock.getText()));
             selected.setThreshold(Double.parseDouble(txtProductThreshold.getText()));
             selected.setType(comboProductType.getValue());
+            selected.setImage(selectedImageBytes);
+
 
             if (productDAO.updateProduct(selected)) {
                 refreshProductTable();
@@ -380,6 +449,9 @@ public class OwnerController {
     private void clearProductFields() {
         txtProductName.clear(); txtProductPrice.clear(); txtProductStock.clear(); txtProductThreshold.clear();
         comboProductType.getSelectionModel().clearSelection();
+        productImageView.setImage(null);
+        imageInfoLabel.setText("Drag & drop image or choose.");
+        selectedImageBytes = null;
     }
     private void clearCarrierFields() {
         txtCarrierUser.clear(); txtCarrierPass.clear(); txtCarrierAddress.clear();
@@ -568,6 +640,40 @@ public class OwnerController {
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+
+    private boolean isImageFile(File f) {
+        String n = f.getName().toLowerCase();
+        return n.endsWith(".png") || n.endsWith(".jpg")
+                || n.endsWith(".jpeg") || n.endsWith(".gif");
+    }
+
+    private void loadImageFromFile(File file) {
+        try {
+            Image img = new Image(file.toURI().toString());
+            productImageView.setImage(img);
+
+            selectedImageBytes = Files.readAllBytes(file.toPath());
+            imageInfoLabel.setText(file.getName() + " (" + selectedImageBytes.length / 1024 + " KB)");
+        } catch (Exception e) {
+            selectedImageBytes = null;
+            imageInfoLabel.setText("Image load failed.");
+        }
+    }
+
+    @FXML
+    private void handleChooseImage() {
+        FileChooser fc = new FileChooser();
+        fc.setTitle("Select Product Image");
+        fc.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Images", "*.png", "*.jpg", "*.jpeg", "*.gif")
+        );
+
+        File file = fc.showOpenDialog(tableProducts.getScene().getWindow());
+        if (file != null) {
+            loadImageFromFile(file);
         }
     }
 

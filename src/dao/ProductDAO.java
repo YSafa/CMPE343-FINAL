@@ -96,17 +96,33 @@ public class ProductDAO {
      * Updates an existing product.
      */
     public boolean updateProduct(Product product) {
-        String sql = "UPDATE productinfo SET name=?, type=?, price=?, stock=?, image=?, threshold=? WHERE id=?";
+
+        boolean hasImage = product.getImage() != null;
+
+        String sqlWithImage =
+                "UPDATE productinfo SET name=?, type=?, price=?, stock=?, image=?, threshold=? WHERE id=?";
+
+        String sqlWithoutImage =
+                "UPDATE productinfo SET name=?, type=?, price=?, stock=?, threshold=? WHERE id=?";
+
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(
+                     hasImage ? sqlWithImage : sqlWithoutImage
+             )) {
 
             stmt.setString(1, product.getName());
             stmt.setString(2, product.getType());
             stmt.setDouble(3, product.getPrice());
             stmt.setDouble(4, product.getStock());
-            stmt.setBytes(5, product.getImage());
-            stmt.setDouble(6, product.getThreshold());
-            stmt.setInt(7, product.getId());
+
+            if (hasImage) {
+                stmt.setBytes(5, product.getImage());
+                stmt.setDouble(6, product.getThreshold());
+                stmt.setInt(7, product.getId());
+            } else {
+                stmt.setDouble(5, product.getThreshold());
+                stmt.setInt(6, product.getId());
+            }
 
             stmt.executeUpdate();
             return true;
@@ -120,6 +136,7 @@ public class ProductDAO {
             return false;
         }
     }
+
 
     /**
      * Deletes a product by ID.
