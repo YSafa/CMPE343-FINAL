@@ -5,6 +5,7 @@ public class CartItem
     private Product product;
     private double quantity;
 
+
     // Constructor
     public CartItem(Product product, double quantity)
     {

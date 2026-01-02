@@ -28,6 +28,11 @@ public class CartController {
     @FXML
     private Label totalLabel;
 
+    @FXML
+    private Label subtotalLabel;
+    @FXML
+    private Label vatLabel;
+
     private Cart cart;
 
 
@@ -39,7 +44,8 @@ public class CartController {
 
         cartItems.setAll(cart.getItems());
         cartTable.setItems(cartItems);
-        updateTotal(cart);
+        updateTotals();
+
     }
 
     @FXML
@@ -66,19 +72,11 @@ public class CartController {
         cartTable.setItems(cartItems);
     }
 
-    private void updateTotal(Cart cart) {
-        totalLabel.setText(
-                String.format("Total (incl. VAT): ₺%.2f", cart.getTotalPriceWithVAT())
-        );
-    }
-
 
     private void refresh() {
         if (cart == null) return;
         cartItems.setAll(cart.getItems());
-        totalLabel.setText(
-                String.format("Total (incl. VAT): ₺%.2f", cart.getTotalPriceWithVAT())
-        );
+        updateTotals();
     }
 
     @FXML
@@ -103,11 +101,32 @@ public class CartController {
 
         cart.removeItem(selected.getProduct());
         refresh();
+        updateTotals();
     }
 
     private void showError(String msg) {
         Alert alert = new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK);
         alert.showAndWait();
     }
+
+    private static final double VAT_RATE = 0.18;
+
+    private void updateTotals() {
+
+        double subtotal = 0.0;
+
+        for (CartItem item : cartItems) {
+            subtotal += item.getTotalItemPrice();
+        }
+
+        double vatAmount = subtotal * VAT_RATE;
+        double total = subtotal + vatAmount;
+
+        subtotalLabel.setText(String.format("Subtotal: ₺%.2f", subtotal));
+        vatLabel.setText(String.format("VAT (18%%): ₺%.2f", vatAmount));
+        totalLabel.setText(String.format("Total (incl. VAT): ₺%.2f", total));
+    }
+
+
 
 }

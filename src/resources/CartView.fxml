@@ -25,12 +25,24 @@
     </center>
 
     <bottom>
-        <HBox spacing="20" alignment="CENTER" style="-fx-padding: 10;">
-            <Label fx:id="totalLabel" text="Total (incl. VAT): ₺0.00"/>
-            <Button text="Remove Selected" onAction="#handleRemove"/>
-            <Button text="Close" onAction="#handleClose"/>
-        </HBox>
+        <VBox spacing="10" style="-fx-padding: 10;">
+
+            <!-- Totals -->
+            <VBox spacing="4" alignment="CENTER_RIGHT">
+                <Label fx:id="subtotalLabel" text="Subtotal: ₺0.00"/>
+                <Label fx:id="vatLabel" text="VAT (18%): ₺0.00"/>
+                <Label fx:id="totalLabel" text="Total (incl. VAT): ₺0.00"/>
+            </VBox>
+
+            <!-- Buttons -->
+            <HBox spacing="20" alignment="CENTER">
+                <Button text="Remove Selected" onAction="#handleRemove"/>
+                <Button text="Close" onAction="#handleClose"/>
+            </HBox>
+
+        </VBox>
     </bottom>
+
 
 
 </BorderPane>
