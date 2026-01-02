@@ -45,10 +45,45 @@ public class OrderDAO {
         }
         return false;
     }
+    public Order getOrderWithDetails(int orderId) {
+
+        String sql = """
+        SELECT o.*,
+               u.username AS customerName,
+               u.address AS customerAddress,
+               c.username AS carrierName
+        FROM orderinfo o
+        JOIN userinfo u ON o.user_id = u.id
+        LEFT JOIN userinfo c ON o.carrier_id = c.id
+        WHERE o.id = ?
+    """;
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, orderId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Order o = new Order(
+                        rs.getInt("id"),
+                        rs.getTimestamp("ordertime"),
+                        rs.getTimestamp("deliverytime"),
+                        rs.getString("products"),
+                        rs.getInt("user_id"),
+                        rs.getInt("carrier_id"),
+                        rs.getBoolean("isdelivered"),
+                        rs.getDouble("totalcost"),
+                        ""
+                );
+
+                o.setCancelled(rs.getBoolean("iscancelled"));
+                o.setCustomerName(rs.getString("customerName"));
+                o.setCustomerAddress(rs.getString("customerAddress"));
 
 
 
-    public List<Order> getAllOrdersWithDetails() {
+                public List<Order> getAllOrdersWithDetails() {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT o.*, u.username AS customerName, c.username AS carrierName " +
                 "FROM orderinfo o " +
