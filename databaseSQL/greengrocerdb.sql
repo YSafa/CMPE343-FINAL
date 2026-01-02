@@ -38,7 +38,7 @@ CREATE TABLE `carrier_ratings` (
   CONSTRAINT `carrier_ratings_ibfk_2` FOREIGN KEY (`customer_id`) REFERENCES `userinfo` (`id`),
   CONSTRAINT `carrier_ratings_ibfk_3` FOREIGN KEY (`carrier_id`) REFERENCES `userinfo` (`id`),
   CONSTRAINT `carrier_ratings_chk_1` CHECK ((`rating` between 1 and 5))
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -47,7 +47,7 @@ CREATE TABLE `carrier_ratings` (
 
 LOCK TABLES `carrier_ratings` WRITE;
 /*!40000 ALTER TABLE `carrier_ratings` DISABLE KEYS */;
-INSERT INTO `carrier_ratings` VALUES (1,27,1,2,5,'Teslimat hızlıydı.','2026-01-02 12:53:10');
+INSERT INTO `carrier_ratings` VALUES (1,27,1,2,5,'Teslimat hızlıydı.','2026-01-02 12:53:10'),(2,2,1,2,3,'','2026-01-02 13:08:33'),(3,3,1,2,2,'teslimat iyiydi','2026-01-02 13:10:50');
 /*!40000 ALTER TABLE `carrier_ratings` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -70,7 +70,7 @@ CREATE TABLE `messages` (
   KEY `fk_msg_receiver` (`receiver_id`),
   CONSTRAINT `fk_msg_receiver` FOREIGN KEY (`receiver_id`) REFERENCES `userinfo` (`id`),
   CONSTRAINT `fk_msg_sender` FOREIGN KEY (`sender_id`) REFERENCES `userinfo` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -79,7 +79,7 @@ CREATE TABLE `messages` (
 
 LOCK TABLES `messages` WRITE;
 /*!40000 ALTER TABLE `messages` DISABLE KEYS */;
-INSERT INTO `messages` VALUES (1,1,3,'sdfsdfsdf','2026-01-02 14:07:51',0),(2,1,3,'fsdfsdfsdf','2026-01-02 14:07:55',0),(3,3,1,'Hello','2026-01-02 14:15:45',0),(4,1,3,'Hi','2026-01-02 14:21:49',0),(5,1,3,'hello','2026-01-02 14:24:47',0),(6,1,3,'hı','2026-01-02 14:37:25',0);
+INSERT INTO `messages` VALUES (1,1,3,'sdfsdfsdf','2026-01-02 14:07:51',0),(2,1,3,'fsdfsdfsdf','2026-01-02 14:07:55',0),(3,3,1,'Hello','2026-01-02 14:15:45',0),(4,1,3,'Hi','2026-01-02 14:21:49',0),(5,1,3,'hello','2026-01-02 14:24:47',0),(6,1,3,'hı','2026-01-02 14:37:25',0),(7,5,3,'sena','2026-01-02 16:17:43',0);
 /*!40000 ALTER TABLE `messages` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -161,7 +161,7 @@ CREATE TABLE `userinfo` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `unique_username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -170,7 +170,7 @@ CREATE TABLE `userinfo` (
 
 LOCK TABLES `userinfo` WRITE;
 /*!40000 ALTER TABLE `userinfo` DISABLE KEYS */;
-INSERT INTO `userinfo` VALUES (1,'cust','80d26609c5226268981e4a6d4ceddbc339d991841ae580e3180b56c8ade7651d','customer','Kadir Has Cad. No:1, Istanbul'),(2,'carr','f9356b0952e5681f9bb4969078d6762f1f3f3eb9e87b80d6544103ad918f074c','carrier','Besiktas, Istanbul'),(3,'own','5b3975651c3cab92d044c096dc30a1c2d9525497457472de48c51ecb363d1f4a','owner','Fatih, Istanbul');
+INSERT INTO `userinfo` VALUES (1,'cust','80d26609c5226268981e4a6d4ceddbc339d991841ae580e3180b56c8ade7651d','customer','Kadir Has Cad. No:1, Istanbul'),(2,'carr','f9356b0952e5681f9bb4969078d6762f1f3f3eb9e87b80d6544103ad918f074c','carrier','Besiktas, Istanbul'),(3,'own','5b3975651c3cab92d044c096dc30a1c2d9525497457472de48c51ecb363d1f4a','owner','Fatih, Istanbul'),(5,'senacoskun','4a1cb623b7491149353febc05c3c509a1cd47ad8e50e183463d37059da386218','customer','incirköy mah.');
 /*!40000 ALTER TABLE `userinfo` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -183,4 +183,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-01-02 15:55:21
+-- Dump completed on 2026-01-02 16:42:45
