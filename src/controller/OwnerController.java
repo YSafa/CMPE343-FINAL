@@ -4,6 +4,7 @@ import dao.RatingDAO;
 import dao.OrderDAO;
 import dao.ProductDAO;
 import dao.UserDAO;
+import dao.CouponDAO;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -17,6 +18,7 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import model.Coupon;
 import model.Order;
 import model.Product;
 import model.User;
@@ -66,19 +68,63 @@ public class OwnerController {
     @FXML private BarChart<String, Number> salesChart;
     @FXML private PieChart statusPieChart; // YENİ EKLENDİ
 
+    //kupon için
+    @FXML private TableView<Coupon> tableCoupons;
+    @FXML private TableColumn<Coupon, Integer> colCouponId;
+    @FXML private TableColumn<Coupon, String> colCouponCode, colCouponExpire;
+    @FXML private TableColumn<Coupon, Double> colCouponRate;
+    @FXML private TableColumn<Coupon, Boolean> colCouponActive;
+
+    @FXML private TextField txtCouponCode, txtCouponRate, txtCouponDays, txtCouponMin;
+
+
     // --- DAOs ---
     private ProductDAO productDAO = new ProductDAO();
     private UserDAO userDAO = new UserDAO();
     private OrderDAO orderDAO = new OrderDAO();
+    private CouponDAO couponDAO = new CouponDAO();
     private RatingDAO ratingDAO = new RatingDAO();
 
     @FXML
     public void initialize() {
         setupTableColumns();
+        setupCouponColumns();
         loadAllData();
+        handleRefreshCoupons();
         if (comboProductType != null) {
             comboProductType.setItems(FXCollections.observableArrayList("vegetable", "fruit"));
         }
+    }
+
+    @FXML
+    private void handleViewCarrierReviews() {
+
+        User selected = tableCarriers.getSelectionModel().getSelectedItem();
+
+        if (selected == null) {
+            Alertutil.showWarningMessage("Please select a carrier.");
+            return;
+        }
+
+        List<String> comments =
+                ratingDAO.getCommentsForCarrier(selected.getId());
+
+        if (comments.isEmpty()) {
+            Alertutil.showInfoMessage("No comments for this carrier.");
+            return;
+        }
+
+        TextArea area = new TextArea();
+        area.setEditable(false);
+        area.setWrapText(true);
+
+        comments.forEach(c -> area.appendText("• " + c + "\n\n"));
+
+        Stage stage = new Stage();
+        stage.setTitle("Carrier Reviews");
+
+        stage.setScene(new Scene(new VBox(area), 450, 300));
+        stage.show();
     }
 
     private void setupTableColumns() {
@@ -93,20 +139,25 @@ public class OwnerController {
         colCarrId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colCarrUser.setCellValueFactory(new PropertyValueFactory<>("username"));
         colCarrAddress.setCellValueFactory(new PropertyValueFactory<>("address"));
+
         colCarrRating.setCellValueFactory(cell -> {
             User carrier = cell.getValue();
 
             double avg = ratingDAO.getAverageRatingForCarrier(carrier.getId());
             int count = ratingDAO.getRatingCountForCarrier(carrier.getId());
+            int commentCount = ratingDAO.getCommentsForCarrier(carrier.getId()).size();
 
             if (count == 0) {
                 return new SimpleStringProperty("No ratings");
             }
 
+            String commentIcon = commentCount > 0 ? " 💬" : "";
+
             return new SimpleStringProperty(
-                    String.format("⭐ %.1f (%d)", avg, count)
+                    String.format("⭐ %.1f (%d)%s", avg, count, commentIcon)
             );
         });
+
 
         // Order Table
         colOrderId.setCellValueFactory(new PropertyValueFactory<>("id"));
@@ -391,5 +442,90 @@ public class OwnerController {
         }
         throw new RuntimeException("Customer not found");
     }
+
+    // kupon için
+    /**
+     * Load all coupons from the database and show them in the table.
+     * This method is called when "Refresh" button is pressed.
+     */
+    @FXML
+    private void handleRefreshCoupons() {
+        tableCoupons.setItems(FXCollections.observableArrayList(couponDAO.getUserCoupons(0))); // 0 = show all
+    }
+
+    /**
+     * Create a new coupon when the owner clicks the button.
+     * It checks for valid inputs and allowed value ranges before sending data to the database.
+     */
+    @FXML
+    private void handleCreateCoupon() {
+        String code = txtCouponCode.getText().trim();
+        String rateStr = txtCouponRate.getText().trim();
+        String daysStr = txtCouponDays.getText().trim();
+        String minStr = txtCouponMin.getText().trim();
+
+        if (code.isEmpty() || rateStr.isEmpty() || daysStr.isEmpty() || minStr.isEmpty()) {
+            Alertutil.showWarningMessage("All coupon fields must be filled!");
+            return;
+        }
+
+        try {
+            double rate = Double.parseDouble(rateStr);
+            int days = Integer.parseInt(daysStr);
+            double minValue = Double.parseDouble(minStr);
+
+            // --- VALIDATION RULES ---
+            if (rate <= 0 || rate > 50) {
+                Alertutil.showWarningMessage("Discount rate must be between 1 and 50!");
+                return;
+            }
+            if (days <= 0 || days > 365) {
+                Alertutil.showWarningMessage("Valid days must be between 1 and 365!");
+                return;
+            }
+            if (minValue < 0 || minValue > 10000) {
+                Alertutil.showWarningMessage("Minimum cart value must be between 0 and 10000!");
+                return;
+            }
+
+            if (showConfirm("Create Coupon", "Add new coupon: " + code + "?")) {
+                boolean created = couponDAO.createCoupon(code, rate, days, minValue, null);
+                if (created) {
+                    handleRefreshCoupons();
+                    clearCouponFields();
+                    Alertutil.showSuccessMessage("Coupon created successfully.");
+                } else {
+                    Alertutil.showErrorMessage("Error creating coupon.");
+                }
+            }
+
+        } catch (NumberFormatException e) {
+            Alertutil.showWarningMessage("Invalid number format!");
+        }
+    }
+
+
+    /**
+     * Clear all text fields in the coupon form.
+     */
+    private void clearCouponFields() {
+        txtCouponCode.clear();
+        txtCouponRate.clear();
+        txtCouponDays.clear();
+        txtCouponMin.clear();
+    }
+
+    /**
+     * Initialize coupon table columns when OwnerView is loaded.
+     * This should be called from initialize().
+     */
+    private void setupCouponColumns() {
+        colCouponId.setCellValueFactory(new PropertyValueFactory<>("id"));
+        colCouponCode.setCellValueFactory(new PropertyValueFactory<>("code"));
+        colCouponRate.setCellValueFactory(new PropertyValueFactory<>("discountRate"));
+        colCouponExpire.setCellValueFactory(new PropertyValueFactory<>("expirationDate"));
+        colCouponActive.setCellValueFactory(new PropertyValueFactory<>("active"));
+    }
+
 
 }

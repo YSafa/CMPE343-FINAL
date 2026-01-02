@@ -9,45 +9,43 @@ import java.util.List;
 
 public class OrderDAO {
 
-    public boolean placeOrderWithTransaction(User user, Cart cart, LocalDateTime deliveryTime) {
-        String insertOrderSQL = "INSERT INTO orderinfo (ordertime, deliverytime, products, user_id, carrier_id, isdelivered, totalcost) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        String updateStockSQL = "UPDATE productinfo SET stock = stock - ? WHERE id = ?";
+    public boolean placeOrderWithTransaction(User user, Cart cart, LocalDateTime deliveryTime, String usedCouponCode) {
+        String insertOrder = "INSERT INTO orderinfo (user_id, total_cost, products, order_time, delivery_time, used_coupon_code) VALUES (?, ?, ?, NOW(), ?, ?)";
         Connection conn = null;
 
         try {
             conn = DatabaseConnection.getConnection();
-            if (conn == null) return false;
             conn.setAutoCommit(false);
 
-            try (PreparedStatement orderStmt = conn.prepareStatement(insertOrderSQL)) {
-                orderStmt.setTimestamp(1, Timestamp.valueOf(LocalDateTime.now()));
-                orderStmt.setTimestamp(2, Timestamp.valueOf(deliveryTime));
-                orderStmt.setString(3, cart.getCartContentAsString());
-                orderStmt.setInt(4, user.getId());
-                orderStmt.setInt(5, 0);
-                orderStmt.setInt(6, 0);
-                orderStmt.setDouble(7, cart.getTotalPriceWithVAT());
-                orderStmt.executeUpdate();
-            }
+            double total = cart.getTotalPrice();
+            String products = cart.getCartContentAsString();
 
-            try (PreparedStatement stockStmt = conn.prepareStatement(updateStockSQL)) {
-                for (CartItem item : cart.getItems()) {
-                    stockStmt.setDouble(1, item.getQuantity());
-                    stockStmt.setInt(2, item.getProduct().getId());
-                    stockStmt.executeUpdate();
-                }
+
+            PreparedStatement stmt = conn.prepareStatement(insertOrder);
+            stmt.setInt(1, user.getId());
+            stmt.setDouble(2, total);
+            stmt.setString(3, products);
+            stmt.setTimestamp(4, Timestamp.valueOf(deliveryTime));
+            stmt.setString(5, usedCouponCode);
+            stmt.executeUpdate();
+
+            // 🔹 Kuponu pasif hale getir (kullanılmış say)
+            if (usedCouponCode != null && !usedCouponCode.isEmpty()) {
+                new CouponDAO().markAsUsed(usedCouponCode);
             }
 
             conn.commit();
             return true;
-        } catch (SQLException e) {
-            if (conn != null) { try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); } }
+
+        } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            try { if (conn != null) conn.rollback(); } catch (Exception ex) { ex.printStackTrace(); }
         } finally {
-            if (conn != null) { try { conn.setAutoCommit(true); conn.close(); } catch (SQLException e) { e.printStackTrace(); } }
+            try { if (conn != null) conn.setAutoCommit(true); } catch (Exception e) { e.printStackTrace(); }
         }
+        return false;
     }
+
 
 
     public List<Order> getAllOrdersWithDetails() {

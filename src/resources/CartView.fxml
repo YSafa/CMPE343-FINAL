@@ -40,6 +40,15 @@
                 <Button text="Close" onAction="#handleClose"/>
             </HBox>
 
+            <!-- Coupon Section -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Coupon Code:"/>
+                <TextField fx:id="couponField" promptText="Enter code" prefWidth="120"/>
+                <Button text="Apply" onAction="#handleApplyCoupon"/>
+                <Label fx:id="couponMessage" textFill="green" style="-fx-font-weight: bold;"/>
+            </HBox>
+
+
         </VBox>
     </bottom>
 
