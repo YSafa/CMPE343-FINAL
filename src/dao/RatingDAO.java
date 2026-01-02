@@ -20,6 +20,34 @@ public class RatingDAO {
             return true;
         }
     }
+    public List<String> getCommentsForCarrier(int carrierId) {
+        List<String> comments = new ArrayList<>();
+
+        String sql = """
+        SELECT comment
+        FROM carrier_ratings
+        WHERE carrier_id = ?
+          AND comment IS NOT NULL
+          AND comment <> ''
+        ORDER BY created_at DESC
+    """;
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, carrierId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                comments.add(rs.getString("comment"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return comments;
+    }
 
     public boolean addRating(int orderId, int customerId, int carrierId,
                              int rating, String comment) {
