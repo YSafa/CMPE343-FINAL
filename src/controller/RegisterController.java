@@ -74,14 +74,9 @@ public class RegisterController {
             return;
         }
 
-        String hashedPassword = PasswordUtil.hashPassword(password);
-        if (hashedPassword == null) {
-            errorLabel.setText("Hashing failed.");
-            return;
-        }
 
         try {
-            User user = new User(0, username, hashedPassword, "customer", address);
+            User user = new User(0, username, password , "customer", address);
             if (userDAO.registerCustomer(user)) {
                 Alertutil.showAlert("Success", null, "Registration successful!", Alert.AlertType.INFORMATION);
                 goBackToLogin();
