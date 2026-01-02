@@ -1,32 +1,56 @@
 package dao;
 
 import database.DatabaseConnection;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.*;
 
 public class RatingDAO {
 
-    // Bu sipariş daha önce puanlanmış mı?
     public boolean hasRatingForOrder(int orderId) {
-        String sql = "SELECT id FROM carrier_ratings WHERE order_id = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = "SELECT 1 FROM carrier_ratings WHERE order_id = ?";
 
-            ps.setInt(1, orderId);
-            ResultSet rs = ps.executeQuery();
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, orderId);
+            ResultSet rs = stmt.executeQuery();
             return rs.next();
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
-            return false;
+            return true;
         }
     }
+    public List<String> getCommentsForCarrier(int carrierId) {
+        List<String> comments = new ArrayList<>();
 
-    // Yeni rating ekle
-    public boolean addRating(int orderId, int customerId,
-                             int carrierId, int rating, String comment) {
+        String sql = """
+        SELECT comment
+        FROM carrier_ratings
+        WHERE carrier_id = ?
+          AND comment IS NOT NULL
+          AND comment <> ''
+        ORDER BY created_at DESC
+    """;
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, carrierId);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                comments.add(rs.getString("comment"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return comments;
+    }
+
+    public boolean addRating(int orderId, int customerId, int carrierId,
+                             int rating, String comment) {
 
         String sql = """
             INSERT INTO carrier_ratings
@@ -35,20 +59,65 @@ public class RatingDAO {
         """;
 
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, orderId);
-            ps.setInt(2, customerId);
-            ps.setInt(3, carrierId);
-            ps.setInt(4, rating);
-            ps.setString(5, comment);
+            stmt.setInt(1, orderId);
+            stmt.setInt(2, customerId);
+            stmt.setInt(3, carrierId);
+            stmt.setInt(4, rating);
+            stmt.setString(5, comment);
 
-            return ps.executeUpdate() > 0;
+            return stmt.executeUpdate() > 0;
 
-        } catch (Exception e) {
-            // UNIQUE(order_id) ihlali burada patlar → zaten puanlanmış
+        } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public double getAverageRatingForCarrier(int carrierId) {
+        String sql = """
+            SELECT AVG(rating)
+            FROM carrier_ratings
+            WHERE carrier_id = ?
+        """;
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, carrierId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getDouble(1);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0.0;
+    }
+
+    public int getRatingCountForCarrier(int carrierId) {
+        String sql = """
+            SELECT COUNT(*)
+            FROM carrier_ratings
+            WHERE carrier_id = ?
+        """;
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, carrierId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }

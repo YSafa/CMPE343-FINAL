@@ -1,5 +1,6 @@
 package controller;
 
+import dao.RatingDAO;
 import dao.OrderDAO;
 import dao.ProductDAO;
 import dao.UserDAO;
@@ -52,7 +53,8 @@ public class OwnerController {
     @FXML private TableView<User> tableCarriers;
     @FXML private TableColumn<User, Integer> colCarrId;
     @FXML private TableColumn<User, String> colCarrUser, colCarrAddress;
-    
+    @FXML private TableColumn<User, String> colCarrRating;
+
     @FXML private TextField txtCarrierUser, txtCarrierAddress;
     @FXML private PasswordField txtCarrierPass;
 
@@ -81,6 +83,7 @@ public class OwnerController {
     private UserDAO userDAO = new UserDAO();
     private OrderDAO orderDAO = new OrderDAO();
     private CouponDAO couponDAO = new CouponDAO();
+    private RatingDAO ratingDAO = new RatingDAO();
 
     @FXML
     public void initialize() {
@@ -91,6 +94,37 @@ public class OwnerController {
         if (comboProductType != null) {
             comboProductType.setItems(FXCollections.observableArrayList("vegetable", "fruit"));
         }
+    }
+
+    @FXML
+    private void handleViewCarrierReviews() {
+
+        User selected = tableCarriers.getSelectionModel().getSelectedItem();
+
+        if (selected == null) {
+            Alertutil.showWarningMessage("Please select a carrier.");
+            return;
+        }
+
+        List<String> comments =
+                ratingDAO.getCommentsForCarrier(selected.getId());
+
+        if (comments.isEmpty()) {
+            Alertutil.showInfoMessage("No comments for this carrier.");
+            return;
+        }
+
+        TextArea area = new TextArea();
+        area.setEditable(false);
+        area.setWrapText(true);
+
+        comments.forEach(c -> area.appendText("• " + c + "\n\n"));
+
+        Stage stage = new Stage();
+        stage.setTitle("Carrier Reviews");
+
+        stage.setScene(new Scene(new VBox(area), 450, 300));
+        stage.show();
     }
 
     private void setupTableColumns() {
@@ -105,6 +139,25 @@ public class OwnerController {
         colCarrId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colCarrUser.setCellValueFactory(new PropertyValueFactory<>("username"));
         colCarrAddress.setCellValueFactory(new PropertyValueFactory<>("address"));
+
+        colCarrRating.setCellValueFactory(cell -> {
+            User carrier = cell.getValue();
+
+            double avg = ratingDAO.getAverageRatingForCarrier(carrier.getId());
+            int count = ratingDAO.getRatingCountForCarrier(carrier.getId());
+            int commentCount = ratingDAO.getCommentsForCarrier(carrier.getId()).size();
+
+            if (count == 0) {
+                return new SimpleStringProperty("No ratings");
+            }
+
+            String commentIcon = commentCount > 0 ? " 💬" : "";
+
+            return new SimpleStringProperty(
+                    String.format("⭐ %.1f (%d)%s", avg, count, commentIcon)
+            );
+        });
+
 
         // Order Table
         colOrderId.setCellValueFactory(new PropertyValueFactory<>("id"));
