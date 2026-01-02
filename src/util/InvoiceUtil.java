@@ -2,7 +2,8 @@ package util;
 
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
-
+import com.itextpdf.text.pdf.draw.LineSeparator;
+import com.itextpdf.text.pdf.draw.VerticalPositionMark;
 import model.Order;
 
 import java.io.FileOutputStream;
