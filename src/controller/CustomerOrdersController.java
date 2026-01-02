@@ -10,7 +10,9 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import javafx.collections.FXCollections;
 import javafx.beans.property.SimpleStringProperty;
-
+import util.InvoiceUtil;
+import java.awt.Desktop;
+import java.nio.file.Path;
 import model.Order;
 import model.User;
 import util.Alertutil;
@@ -62,6 +64,40 @@ public class CustomerOrdersController {
 
         } catch (Exception e) {
             Alertutil.showErrorMessage("Failed to load orders: " + e.getMessage());
+        }
+    }
+    @FXML
+    private void handleDownloadInvoice() {
+
+        Order selected = ordersTable.getSelectionModel().getSelectedItem();
+
+        if (selected == null) {
+            Alertutil.showWarningMessage("Please select an order.");
+            return;
+        }
+
+        if (!selected.isDelivered()) {
+            Alertutil.showWarningMessage(
+                    "Invoice can only be generated for delivered orders."
+            );
+            return;
+        }
+
+        try {
+            Path invoice = InvoiceUtil.generateInvoice(selected);
+
+            Alertutil.showSuccessMessage(
+                    "Invoice generated:\n" + invoice.toAbsolutePath()
+            );
+
+            // Otomatik açmak istersen:
+            Desktop.getDesktop().open(invoice.toFile());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Alertutil.showErrorMessage(
+                    "Failed to generate invoice."
+            );
         }
     }
 
