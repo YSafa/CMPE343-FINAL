@@ -84,13 +84,21 @@ public class CustomerOrdersController {
         }
 
         try {
-            Path invoice = InvoiceUtil.generateInvoice(selected);
+            // 🔴 DETAYLI ORDER
+            Order detailedOrder =
+                    orderDAO.getOrderWithDetails(selected.getId());
+
+            if (detailedOrder == null) {
+                Alertutil.showErrorMessage("Could not load order details.");
+                return;
+            }
+
+            Path invoice = InvoiceUtil.generateInvoice(detailedOrder);
 
             Alertutil.showSuccessMessage(
                     "Invoice generated:\n" + invoice.toAbsolutePath()
             );
 
-            // Otomatik açmak istersen:
             Desktop.getDesktop().open(invoice.toFile());
 
         } catch (Exception e) {
@@ -100,6 +108,7 @@ public class CustomerOrdersController {
             );
         }
     }
+
 
     /**
      * Returns a user-friendly text for the order status.
