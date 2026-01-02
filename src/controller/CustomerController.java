@@ -237,7 +237,7 @@ public class CustomerController implements Initializable {
             StringBuilder message = new StringBuilder("Order placed successfully!");
 
             if (usedCoupon != null) {
-                message.append("\n\n🎟️ Coupon '")
+                message.append("\n\n Coupon '")
                         .append(usedCoupon.getCode())
                         .append("' applied (")
                         .append(usedCoupon.getDiscountRate())
@@ -266,6 +266,7 @@ public class CustomerController implements Initializable {
             }
         }
     }
+
     @FXML
     private void handleMessageOwner() {
         try {

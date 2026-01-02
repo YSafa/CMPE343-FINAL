@@ -11,272 +11,260 @@
 <?import javafx.scene.text.Font?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="540.0" minWidth="900.0" prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.OwnerController">
-   <top>
-      <AnchorPane prefHeight="70.0" prefWidth="1000.0" style="-fx-background-color: white; -fx-border-color: #dddddd; -fx-border-width: 0 0 1 0;" BorderPane.alignment="CENTER">
-         <children>
-            <ImageView fitHeight="50.0" fitWidth="70.0" layoutX="20.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="10.0">
-               <image>
-                  <Image url="@../resources/logo.png" />
-               </image>
-            </ImageView>
-            
-            <Label alignment="CENTER" layoutX="150.0" layoutY="18.0" prefHeight="35.0" text="Greengrocer Owner Panel" textFill="#2c3e50" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="150.0" AnchorPane.topAnchor="18.0">
-               <font>
-                  <Font name="System Bold" size="24.0" />
-               </font>
-            </Label>
-            
-            <Button mnemonicParsing="false" onAction="#handleLogout" prefHeight="32.0" prefWidth="90.0" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand;" text="Logout" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="19.0" />
-         </children>
-      </AnchorPane>
-   </top>
-   <center>
-      <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
-        <tabs>
-          <Tab text="Inventory Management">
-            <content>
-              <AnchorPane prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <TableView fx:id="tableProducts" layoutX="335.0" layoutY="20.0" prefHeight="450.0" prefWidth="644.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="335.0" AnchorPane.rightAnchor="21.0" AnchorPane.topAnchor="20.0">
-                          <columns>
-                            <TableColumn fx:id="colProdId" prefWidth="50.0" text="ID" />
-                            <TableColumn fx:id="colProdName" prefWidth="140.0" text="Name" />
-                              <TableColumn fx:id="colProdPrice" prefWidth="90.0" text="Price" />
-                              <TableColumn fx:id="colProdStock" prefWidth="90.0" text="Stock" />
-                              <TableColumn fx:id="colProdThreshold" prefWidth="100.0" text="Threshold" />
-                          </columns>
-                        </TableView>
-                        <VBox layoutX="20.0" layoutY="20.0" prefWidth="300.0" spacing="15.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0">
-                           <children>
-                              <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="Product Details" />
-                              <GridPane hgap="10.0" vgap="8.0">
-                                <columnConstraints>
-                                  <ColumnConstraints hgrow="SOMETIMES" prefWidth="80.0" />
-                                  <ColumnConstraints hgrow="SOMETIMES" prefWidth="180.0" />
-                                </columnConstraints>
-                                <rowConstraints>
-                                  <RowConstraints prefHeight="30.0" />
-                                  <RowConstraints prefHeight="30.0" />
-                                  <RowConstraints prefHeight="30.0" />
-                                    <RowConstraints prefHeight="30.0" />
-                                    <RowConstraints prefHeight="30.0" />
-                                </rowConstraints>
-                                 <children>
-                                    <Label text="Name:" />
-                                    <TextField fx:id="txtProductName" promptText="Enter product name" GridPane.columnIndex="1" />
-                                    <Label text="Type:" GridPane.rowIndex="1" />
-                                    <ComboBox fx:id="comboProductType" prefWidth="200.0" promptText="Select type" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                    <Label text="Price:" GridPane.rowIndex="2" />
-                                    <TextField fx:id="txtProductPrice" promptText="e.g. 19.99" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                    <Label text="Stock:" GridPane.rowIndex="3" />
-                                    <TextField fx:id="txtProductStock" promptText="e.g. 50.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                    <Label text="Threshold:" GridPane.rowIndex="4" />
-                                    <TextField fx:id="txtProductThreshold" promptText="e.g. 5.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                                 </children>
-                              </GridPane>
-                              <Separator />
-                              <Label style="-fx-font-size: 11px; -fx-text-fill: #cc0000;" text="* If stock ≤ threshold, price doubles!" wrapText="true" />
-                              <Region VBox.vgrow="ALWAYS" />
-                              <Button onAction="#handleAddProduct" prefHeight="35.0" prefWidth="300.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="Add Product" />
-                              <Button onAction="#handleUpdateProduct" prefHeight="35.0" prefWidth="300.0" style="-fx-cursor: hand;" text="Update Selected" />
-                              <Button onAction="#handleDeleteProduct" prefHeight="35.0" prefWidth="300.0" style="-fx-background-color: #ff4d4d; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="Delete Selected" />
-                               <Button text="Customer Messages"
-                                       onAction="#handleOpenMessages"
-                                       prefHeight="32.0"
-                                       prefWidth="160.0"
-                                       style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand;"
-                                       AnchorPane.rightAnchor="130.0"
-                                       AnchorPane.topAnchor="19.0"/>
-                           </children>
-                        </VBox>
-                     </children>
-                  </AnchorPane>
-            </content>
-          </Tab>
-          
-          <Tab text="Carrier Management">
-            <content>
-              <AnchorPane prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <VBox layoutX="20.0" layoutY="20.0" prefWidth="300.0" spacing="15.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0">
-                           <children>
-                              <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="Hire New Carrier" />
-                              <GridPane hgap="10.0" vgap="8.0">
-                                 <columnConstraints>
-                                    <ColumnConstraints prefWidth="80.0" />
-                                    <ColumnConstraints prefWidth="180.0" />
-                                 </columnConstraints>
-                                 <rowConstraints>
-                                    <RowConstraints prefHeight="30.0" />
-                                    <RowConstraints prefHeight="30.0" />
-                                    <RowConstraints prefHeight="30.0" />
-                                 </rowConstraints>
-                                 <children>
-                                    <Label text="Username:" />
-                                    <TextField fx:id="txtCarrierUser" promptText="Min 4 chars (no symbol)" GridPane.columnIndex="1" />
-                                    <Label text="Password:" GridPane.rowIndex="1" />
-                                    <PasswordField fx:id="txtCarrierPass" promptText="Min 4 chars (no symbol)" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                    <Label text="Address:" GridPane.rowIndex="2" />
-                                    <TextField fx:id="txtCarrierAddress" promptText="Min 10 characters" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                 </children>
-                              </GridPane>
-                              <Separator />
-                              <Button onAction="#handleEmployCarrier" prefHeight="35.0" prefWidth="300.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="Employ Carrier" />
-                              <Region VBox.vgrow="ALWAYS" />
-                              <Button onAction="#handleFireCarrier" prefHeight="35.0" prefWidth="300.0" style="-fx-background-color: #ff4d4d; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="Fire Selected Carrier" />
-                           </children>
-                        </VBox>
-                        <TableView fx:id="tableCarriers" layoutX="335.0" layoutY="20.0" prefHeight="450.0" prefWidth="644.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="335.0" AnchorPane.rightAnchor="21.0" AnchorPane.topAnchor="20.0">
-                          <columns>
-                            <TableColumn fx:id="colCarrId" prefWidth="60.0" text="ID" />
-                            <TableColumn fx:id="colCarrUser" prefWidth="180.0" text="Username" />
-                            <TableColumn fx:id="colCarrAddress" prefWidth="350.0" text="Address" />
-                              <TableColumn fx:id="colCarrRating" text="Rating ⭐" prefWidth="140"/>
-                              <Button text="View Reviews"
-                                      onAction="#handleViewCarrierReviews"
-                                      prefWidth="300"/>
-                          </columns>
-                        </TableView>
-                     </children>
-                  </AnchorPane>
-            </content>
-          </Tab>
-          
-          <Tab text="All Orders">
-             <content>
-                <AnchorPane prefHeight="180.0" prefWidth="200.0">
-                   <children>
-                      <TableView fx:id="tableOrders" layoutX="20.0" layoutY="20.0" prefHeight="450.0" prefWidth="960.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
-                         <columns>
-                            <TableColumn fx:id="colOrderId" prefWidth="50.0" text="ID" />
-                            <TableColumn fx:id="colOrderTime" prefWidth="140.0" text="Order Time" />
-                            <TableColumn fx:id="colOrderCustomer" prefWidth="140.0" text="Customer" />
-                            <TableColumn fx:id="colOrderCarrier" prefWidth="140.0" text="Carrier" />
-                            <TableColumn fx:id="colOrderContent" prefWidth="220.0" text="Content" />
-                            <TableColumn fx:id="colOrderTotal" prefWidth="90.0" text="Total (₺)" />
-                            <TableColumn fx:id="colOrderStatus" prefWidth="140.0" text="Status" />
-                         </columns>
-                      </TableView>
-                   </children>
-                </AnchorPane>
-             </content>
-          </Tab>
-          
-          <Tab text="Reports">
-             <content>
-                <ScrollPane fitToWidth="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                   <content>
-                      <VBox spacing="20.0" style="-fx-padding: 20; -fx-background-color: #f4f4f4;">
-                         <children>
-                            <HBox spacing="20.0">
-                               <children>
-                                  <VBox alignment="CENTER" prefHeight="80.0" prefWidth="300.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #4CAF50; -fx-border-radius: 10; -fx-border-width: 2;" HBox.hgrow="ALWAYS">
-                                     <children>
-                                        <Label text="Total Revenue" textFill="#777777"><font><Font size="14.0" /></font></Label>
-                                        <Label fx:id="lblTotalRevenue" text="₺ 0.00" textFill="#4CAF50"><font><Font name="System Bold" size="24.0" /></font></Label>
-                                     </children>
-                                  </VBox>
-                                  <VBox alignment="CENTER" prefHeight="80.0" prefWidth="300.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #2196F3; -fx-border-radius: 10; -fx-border-width: 2;" HBox.hgrow="ALWAYS">
-                                     <children>
-                                        <Label text="Total Orders" textFill="#777777"><font><Font size="14.0" /></font></Label>
-                                        <Label fx:id="lblTotalOrders" text="0" textFill="#2196F3"><font><Font name="System Bold" size="24.0" /></font></Label>
-                                     </children>
-                                  </VBox>
-                                  <VBox alignment="CENTER" prefHeight="80.0" prefWidth="300.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #FF9800; -fx-border-radius: 10; -fx-border-width: 2;" HBox.hgrow="ALWAYS">
-                                     <children>
-                                        <Label text="Active Carriers" textFill="#777777"><font><Font size="14.0" /></font></Label>
-                                        <Label fx:id="lblActiveCarriers" text="0" textFill="#FF9800"><font><Font name="System Bold" size="24.0" /></font></Label>
-                                     </children>
-                                  </VBox>
-                               </children>
-                            </HBox>
-                            
-                            <HBox spacing="20.0" VBox.vgrow="ALWAYS">
-                               <children>
-                                  <VBox style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 10; -fx-border-color: #dddddd; -fx-border-radius: 10;" HBox.hgrow="ALWAYS">
-                                     <children>
-                                        <Label text="Daily Revenue Chart Overview" textFill="#333333"><font><Font name="System Bold" size="16.0" /></font></Label>
-                                        <BarChart fx:id="salesChart" animated="false" legendSide="BOTTOM" prefHeight="350.0">
-                                          <xAxis><CategoryAxis label="Days" side="BOTTOM" /></xAxis>
-                                          <yAxis><NumberAxis label="Revenue (₺)" side="LEFT" /></yAxis>
-                                        </BarChart>
-                                     </children>
-                                  </VBox>
-                                  <VBox prefWidth="400.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 10; -fx-border-color: #dddddd; -fx-border-radius: 10;">
-                                     <children>
-                                        <Label text="Order Distribution Status" textFill="#333333"><font><Font name="System Bold" size="16.0" /></font></Label>
-                                        <PieChart fx:id="statusPieChart" prefHeight="350.0" />
-                                     </children>
-                                  </VBox>
-                               </children>
-                            </HBox>
-                         </children>
-                      </VBox>
-                   </content>
-                </ScrollPane>
-             </content>
-          </Tab>
+    <top>
+        <AnchorPane prefHeight="70.0" prefWidth="1000.0" style="-fx-background-color: white; -fx-border-color: #dddddd; -fx-border-width: 0 0 1 0;" BorderPane.alignment="CENTER">
+            <children>
+                <ImageView fitHeight="50.0" fitWidth="70.0" layoutX="20.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="10.0">
+                    <image>
+                        <Image url="@../resources/logo.png" />
+                    </image>
+                </ImageView>
 
-            <Tab text="Coupon Management">
-                <content>
-                    <AnchorPane prefHeight="180.0" prefWidth="200.0">
-                        <children>
-                            <VBox layoutX="20.0" layoutY="20.0" spacing="10.0" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0">
-                                <children>
-                                    <Label text="Create New Coupon" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+                <Label alignment="CENTER" layoutX="150.0" layoutY="18.0" prefHeight="35.0" text="Greengrocer Owner Panel" textFill="#2c3e50" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="150.0" AnchorPane.topAnchor="18.0">
+                    <font>
+                        <Font name="System Bold" size="24.0" />
+                    </font>
+                </Label>
 
-                                    <GridPane hgap="10.0" vgap="10.0">
-                                        <columnConstraints>
-                                            <ColumnConstraints prefWidth="120.0" />
-                                            <ColumnConstraints prefWidth="200.0" />
-                                        </columnConstraints>
-                                        <rowConstraints>
-                                            <RowConstraints prefHeight="30.0" />
-                                            <RowConstraints prefHeight="30.0" />
-                                            <RowConstraints prefHeight="30.0" />
-                                            <RowConstraints prefHeight="30.0" />
-                                            <RowConstraints prefHeight="30.0" />
-                                        </rowConstraints>
-                                        <children>
-                                            <Label text="Code:" />
-                                            <TextField fx:id="txtCouponCode" GridPane.columnIndex="1" promptText="e.g. SAVE10" />
+                <Button mnemonicParsing="false" onAction="#handleLogout" prefHeight="32.0" prefWidth="90.0" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand;" text="Logout" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="19.0" />
+            </children>
+        </AnchorPane>
+    </top>
+    <center>
+        <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+            <tabs>
+                <Tab text="Inventory Management">
+                    <content>
+                        <AnchorPane prefHeight="180.0" prefWidth="200.0">
+                            <children>
+                                <TableView fx:id="tableProducts" layoutX="335.0" layoutY="20.0" prefHeight="450.0" prefWidth="644.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="335.0" AnchorPane.rightAnchor="21.0" AnchorPane.topAnchor="20.0">
+                                    <columns>
+                                        <TableColumn fx:id="colProdId" prefWidth="50.0" text="ID" />
+                                        <TableColumn fx:id="colProdName" prefWidth="140.0" text="Name" />
+                                        <TableColumn fx:id="colProdPrice" prefWidth="90.0" text="Price" />
+                                        <TableColumn fx:id="colProdStock" prefWidth="90.0" text="Stock" />
+                                        <TableColumn fx:id="colProdThreshold" prefWidth="100.0" text="Threshold" />
+                                    </columns>
+                                </TableView>
+                                <VBox layoutX="20.0" layoutY="20.0" prefWidth="300.0" spacing="15.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0">
+                                    <children>
+                                        <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="Product Details" />
+                                        <GridPane hgap="10.0" vgap="8.0">
+                                            <columnConstraints>
+                                                <ColumnConstraints hgrow="SOMETIMES" prefWidth="80.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" prefWidth="180.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                                <RowConstraints prefHeight="30.0" />
+                                                <RowConstraints prefHeight="30.0" />
+                                                <RowConstraints prefHeight="30.0" />
+                                                <RowConstraints prefHeight="30.0" />
+                                                <RowConstraints prefHeight="30.0" />
+                                                <RowConstraints prefHeight="30.0" />
+                                                <RowConstraints prefHeight="35.0" />
+                                            </rowConstraints>
+                                            <children>
+                                                <Label text="Name:" />
+                                                <TextField fx:id="txtProductName" promptText="Enter product name" GridPane.columnIndex="1" />
+                                                <Label text="Type:" GridPane.rowIndex="1" />
+                                                <ComboBox fx:id="comboProductType" prefWidth="200.0" promptText="Select type" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                <Label text="Price:" GridPane.rowIndex="2" />
+                                                <TextField fx:id="txtProductPrice" promptText="e.g. 19.99" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                <Label text="Stock:" GridPane.rowIndex="3" />
+                                                <TextField fx:id="txtProductStock" promptText="e.g. 50.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                <Label text="Threshold:" GridPane.rowIndex="4" />
+                                                <TextField fx:id="txtProductThreshold" promptText="e.g. 5.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
 
-                                            <Label text="Discount (%):" GridPane.rowIndex="1" />
-                                            <TextField fx:id="txtCouponRate" GridPane.columnIndex="1" GridPane.rowIndex="1" promptText="10" />
+                                                <Label text="Customer:" GridPane.rowIndex="5" />
+                                                <ComboBox fx:id="customerBox" prefWidth="200.0" promptText="Select Customer" GridPane.columnIndex="1" GridPane.rowIndex="5" />
 
-                                            <Label text="Valid (days):" GridPane.rowIndex="2" />
-                                            <TextField fx:id="txtCouponDays" GridPane.columnIndex="1" GridPane.rowIndex="2" promptText="7" />
+                                                <Button onAction="#handleOpenMessages" prefWidth="200.0" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold;" text="Open Messages" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                                            </children>
+                                        </GridPane>
+                                        <Separator />
+                                        <Label style="-fx-font-size: 11px; -fx-text-fill: #cc0000;" text="* If stock ≤ threshold, price doubles!" wrapText="true" />
+                                        <Region VBox.vgrow="ALWAYS" />
+                                        <Button onAction="#handleAddProduct" prefHeight="35.0" prefWidth="300.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="Add Product" />
+                                        <Button onAction="#handleUpdateProduct" prefHeight="35.0" prefWidth="300.0" style="-fx-cursor: hand;" text="Update Selected" />
+                                        <Button onAction="#handleDeleteProduct" prefHeight="35.0" prefWidth="300.0" style="-fx-background-color: #ff4d4d; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="Delete Selected" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </Tab>
 
-                                            <Label text="Min Cart Value (₺):" GridPane.rowIndex="3" />
-                                            <TextField fx:id="txtCouponMin" GridPane.columnIndex="1" GridPane.rowIndex="3" promptText="100" />
-                                        </children>
-                                    </GridPane>
+                <Tab text="Carrier Management">
+                    <content>
+                        <AnchorPane prefHeight="180.0" prefWidth="200.0">
+                            <children>
+                                <VBox layoutX="20.0" layoutY="20.0" prefWidth="300.0" spacing="15.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0">
+                                    <children>
+                                        <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="Hire New Carrier" />
+                                        <GridPane hgap="10.0" vgap="8.0">
+                                            <columnConstraints>
+                                                <ColumnConstraints prefWidth="80.0" />
+                                                <ColumnConstraints prefWidth="180.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                                <RowConstraints prefHeight="30.0" />
+                                                <RowConstraints prefHeight="30.0" />
+                                                <RowConstraints prefHeight="30.0" />
+                                            </rowConstraints>
+                                            <children>
+                                                <Label text="Username:" />
+                                                <TextField fx:id="txtCarrierUser" promptText="Min 4 chars" GridPane.columnIndex="1" />
+                                                <Label text="Password:" GridPane.rowIndex="1" />
+                                                <PasswordField fx:id="txtCarrierPass" promptText="Min 4 chars" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                <Label text="Address:" GridPane.rowIndex="2" />
+                                                <TextField fx:id="txtCarrierAddress" promptText="Min 10 characters" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                            </children>
+                                        </GridPane>
+                                        <Separator />
+                                        <Button onAction="#handleEmployCarrier" prefHeight="35.0" prefWidth="300.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;" text="Employ Carrier" />
+                                        <Button onAction="#handleViewCarrierReviews" prefHeight="35.0" prefWidth="300.0" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold;" text="View Selected Reviews" />
+                                        <Region VBox.vgrow="ALWAYS" />
+                                        <Button onAction="#handleFireCarrier" prefHeight="35.0" prefWidth="300.0" style="-fx-background-color: #ff4d4d; -fx-text-fill: white; -fx-font-weight: bold;" text="Fire Selected Carrier" />
+                                    </children>
+                                </VBox>
 
-                                    <HBox spacing="10">
-                                        <Button fx:id="btnCreateCoupon" text="Create Coupon" onAction="#handleCreateCoupon"
-                                                style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" />
-                                        <Button fx:id="btnRefreshCoupons" text="Refresh" onAction="#handleRefreshCoupons"
-                                                style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" />
-                                    </HBox>
+                                <TableView fx:id="tableCarriers" layoutX="335.0" layoutY="20.0" prefHeight="450.0" prefWidth="644.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="335.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+                                    <columns>
+                                        <TableColumn fx:id="colCarrId" prefWidth="60.0" text="ID" />
+                                        <TableColumn fx:id="colCarrUser" prefWidth="180.0" text="Username" />
+                                        <TableColumn fx:id="colCarrAddress" prefWidth="250.0" text="Address" />
+                                        <TableColumn fx:id="colCarrRating" prefWidth="140.0" text="Rating ⭐" />
+                                    </columns>
+                                </TableView>
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </Tab>
 
-                                    <TableView fx:id="tableCoupons" prefWidth="600" prefHeight="300">
-                                        <columns>
-                                            <TableColumn fx:id="colCouponId" prefWidth="60" text="ID" />
-                                            <TableColumn fx:id="colCouponCode" prefWidth="120" text="Code" />
-                                            <TableColumn fx:id="colCouponRate" prefWidth="100" text="Discount (%)" />
-                                            <TableColumn fx:id="colCouponExpire" prefWidth="180" text="Expires" />
-                                            <TableColumn fx:id="colCouponActive" prefWidth="100" text="Active" />
-                                        </columns>
-                                    </TableView>
-                                </children>
-                            </VBox>
-                        </children>
-                    </AnchorPane>
-                </content>
-            </Tab>
+                <Tab text="All Orders">
+                    <content>
+                        <AnchorPane prefHeight="180.0" prefWidth="200.0">
+                            <children>
+                                <TableView fx:id="tableOrders" layoutX="20.0" layoutY="20.0" prefHeight="450.0" prefWidth="960.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
+                                    <columns>
+                                        <TableColumn fx:id="colOrderId" prefWidth="50.0" text="ID" />
+                                        <TableColumn fx:id="colOrderTime" prefWidth="140.0" text="Order Time" />
+                                        <TableColumn fx:id="colOrderCustomer" prefWidth="140.0" text="Customer" />
+                                        <TableColumn fx:id="colOrderCarrier" prefWidth="140.0" text="Carrier" />
+                                        <TableColumn fx:id="colOrderContent" prefWidth="220.0" text="Content" />
+                                        <TableColumn fx:id="colOrderTotal" prefWidth="90.0" text="Total (₺)" />
+                                        <TableColumn fx:id="colOrderStatus" prefWidth="140.0" text="Status" />
+                                    </columns>
+                                </TableView>
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </Tab>
 
+                <Tab text="Reports">
+                    <content>
+                        <ScrollPane fitToWidth="true">
+                            <content>
+                                <VBox spacing="20.0" style="-fx-padding: 20; -fx-background-color: #f4f4f4;">
+                                    <children>
+                                        <HBox spacing="20.0">
+                                            <children>
+                                                <VBox alignment="CENTER" prefHeight="80.0" prefWidth="300.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #4CAF50; -fx-border-radius: 10; -fx-border-width: 2;" HBox.hgrow="ALWAYS">
+                                                    <children>
+                                                        <Label text="Total Revenue" textFill="#777777"><font><Font size="14.0" /></font></Label>
+                                                        <Label fx:id="lblTotalRevenue" text="₺ 0.00" textFill="#4CAF50"><font><Font name="System Bold" size="24.0" /></font></Label>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER" prefHeight="80.0" prefWidth="300.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #2196F3; -fx-border-radius: 10; -fx-border-width: 2;" HBox.hgrow="ALWAYS">
+                                                    <children>
+                                                        <Label text="Total Orders" textFill="#777777"><font><Font size="14.0" /></font></Label>
+                                                        <Label fx:id="lblTotalOrders" text="0" textFill="#2196F3"><font><Font name="System Bold" size="24.0" /></font></Label>
+                                                    </children>
+                                                </VBox>
+                                                <VBox alignment="CENTER" prefHeight="80.0" prefWidth="300.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #FF9800; -fx-border-radius: 10; -fx-border-width: 2;" HBox.hgrow="ALWAYS">
+                                                    <children>
+                                                        <Label text="Active Carriers" textFill="#777777"><font><Font size="14.0" /></font></Label>
+                                                        <Label fx:id="lblActiveCarriers" text="0" textFill="#FF9800"><font><Font name="System Bold" size="24.0" /></font></Label>
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                        </HBox>
 
-        </tabs>
-      </TabPane>
-   </center>
+                                        <HBox spacing="20.0" VBox.vgrow="ALWAYS">
+                                            <children>
+                                                <VBox style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 10; -fx-border-color: #dddddd; -fx-border-radius: 10;" HBox.hgrow="ALWAYS">
+                                                    <children>
+                                                        <Label text="Daily Revenue Chart Overview" textFill="#333333"><font><Font name="System Bold" size="16.0" /></font></Label>
+                                                        <BarChart fx:id="salesChart" animated="false" legendSide="BOTTOM" prefHeight="350.0">
+                                                            <xAxis><CategoryAxis label="Days" side="BOTTOM" /></xAxis>
+                                                            <yAxis><NumberAxis label="Revenue (₺)" side="LEFT" /></yAxis>
+                                                        </BarChart>
+                                                    </children>
+                                                </VBox>
+                                                <VBox prefWidth="400.0" style="-fx-background-color: white; -fx-background-radius: 10; -fx-padding: 10; -fx-border-color: #dddddd; -fx-border-radius: 10;">
+                                                    <children>
+                                                        <Label text="Order Distribution Status" textFill="#333333"><font><Font name="System Bold" size="16.0" /></font></Label>
+                                                        <PieChart fx:id="statusPieChart" prefHeight="350.0" />
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+                            </content>
+                        </ScrollPane>
+                    </content>
+                </Tab>
+
+                <Tab text="Coupon Management">
+                    <content>
+                        <AnchorPane prefHeight="180.0" prefWidth="200.0">
+                            <children>
+                                <VBox layoutX="20.0" layoutY="20.0" spacing="10.0" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0">
+                                    <children>
+                                        <Label text="Create New Coupon" style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+                                        <GridPane hgap="10.0" vgap="10.0">
+                                            <columnConstraints>
+                                                <ColumnConstraints prefWidth="120.0" />
+                                                <ColumnConstraints prefWidth="200.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                                <RowConstraints prefHeight="30.0" />
+                                                <RowConstraints prefHeight="30.0" />
+                                                <RowConstraints prefHeight="30.0" />
+                                                <RowConstraints prefHeight="30.0" />
+                                            </rowConstraints>
+                                            <children>
+                                                <Label text="Code:" />
+                                                <TextField fx:id="txtCouponCode" GridPane.columnIndex="1" promptText="e.g. SAVE10" />
+                                                <Label text="Discount (%):" GridPane.rowIndex="1" />
+                                                <TextField fx:id="txtCouponRate" GridPane.columnIndex="1" GridPane.rowIndex="1" promptText="10" />
+                                                <Label text="Valid (days):" GridPane.rowIndex="2" />
+                                                <TextField fx:id="txtCouponDays" GridPane.columnIndex="1" GridPane.rowIndex="2" promptText="7" />
+                                                <Label text="Min Cart Value (₺):" GridPane.rowIndex="3" />
+                                                <TextField fx:id="txtCouponMin" GridPane.columnIndex="1" GridPane.rowIndex="3" promptText="100" />
+                                            </children>
+                                        </GridPane>
+                                        <HBox spacing="10">
+                                            <Button onAction="#handleCreateCoupon" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;" text="Create Coupon" />
+                                            <Button onAction="#handleRefreshCoupons" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold;" text="Refresh" />
+                                        </HBox>
+                                        <TableView fx:id="tableCoupons" prefHeight="300" prefWidth="600">
+                                            <columns>
+                                                <TableColumn fx:id="colCouponId" prefWidth="60" text="ID" />
+                                                <TableColumn fx:id="colCouponCode" prefWidth="120" text="Code" />
+                                                <TableColumn fx:id="colCouponRate" prefWidth="100" text="Discount (%)" />
+                                                <TableColumn fx:id="colCouponExpire" prefWidth="180" text="Expires" />
+                                                <TableColumn fx:id="colCouponActive" prefWidth="100" text="Active" />
+                                            </columns>
+                                        </TableView>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </center>
 </BorderPane>

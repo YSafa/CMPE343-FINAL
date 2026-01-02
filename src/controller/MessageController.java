@@ -63,7 +63,7 @@ public class MessageController {
                     container.setAlignment(Pos.CENTER_LEFT);
                 }
 
-                setText(null); // 🔥 çok önemli
+                setText(null);
                 setGraphic(container);
                 setStyle("-fx-background-color: transparent;");
             }

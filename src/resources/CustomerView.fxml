@@ -25,10 +25,7 @@
                   <Button onAction="#handleViewCart" prefHeight="32.0" style="-fx-background-radius: 20; -fx-cursor: hand;" text="View Cart" />
                   <Button onAction="#handleViewOrders" prefHeight="32.0" style="-fx-background-radius: 20; -fx-cursor: hand;" text="My Orders" />
                   <Button onAction="#handleLogout" prefHeight="32.0" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand;" text="Logout" />
-                   <Button text="Message Owner"
-                           onAction="#handleMessageOwner"
-                           prefHeight="32.0"
-                           style="-fx-background-radius: 20; -fx-cursor: hand;" />
+                   <Button text="Message Owner" onAction="#handleMessageOwner"/>
                </children>
             </HBox>
          </children>

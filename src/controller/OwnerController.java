@@ -24,6 +24,9 @@ import model.Product;
 import model.User;
 import util.Alertutil;
 
+import javafx.scene.layout.VBox;
+
+
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -67,6 +70,7 @@ public class OwnerController {
     @FXML private Label lblTotalRevenue, lblTotalOrders, lblActiveCarriers;
     @FXML private BarChart<String, Number> salesChart;
     @FXML private PieChart statusPieChart; // YENİ EKLENDİ
+    @FXML private ComboBox<User> customerBox;
 
     //kupon için
     @FXML private TableView<Coupon> tableCoupons;
@@ -87,6 +91,7 @@ public class OwnerController {
 
     @FXML
     public void initialize() {
+        loadCustomers();
         setupTableColumns();
         setupCouponColumns();
         loadAllData();
@@ -403,6 +408,7 @@ public class OwnerController {
         }
     }
 
+
     private User getCurrentOwner() throws Exception {
         String sql = "SELECT * FROM userinfo WHERE role='owner' LIMIT 1";
 
@@ -525,6 +531,44 @@ public class OwnerController {
         colCouponRate.setCellValueFactory(new PropertyValueFactory<>("discountRate"));
         colCouponExpire.setCellValueFactory(new PropertyValueFactory<>("expirationDate"));
         colCouponActive.setCellValueFactory(new PropertyValueFactory<>("active"));
+    }
+
+
+    private void loadCustomers() {
+        try {
+            String sql = "SELECT * FROM userinfo WHERE role='customer'";
+            var list = FXCollections.<User>observableArrayList();
+
+            try (var c = DatabaseConnection.getConnection();
+                 var ps = c.prepareStatement(sql);
+                 var rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+                    list.add(new User(
+                            rs.getInt("id"),
+                            rs.getString("username"),
+                            null,
+                            rs.getString("role"),
+                            rs.getString("address")
+                    ));
+                }
+            }
+
+            customerBox.setItems(list);
+
+            // ComboBox’ta username görünsün
+            customerBox.setCellFactory(cb -> new ListCell<>() {
+                @Override
+                protected void updateItem(User u, boolean empty) {
+                    super.updateItem(u, empty);
+                    setText(empty || u == null ? "" : u.getUsername());
+                }
+            });
+            customerBox.setButtonCell(customerBox.getCellFactory().call(null));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
