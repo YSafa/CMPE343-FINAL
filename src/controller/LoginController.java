@@ -25,6 +25,9 @@ public class LoginController {
     @FXML private VBox loginBox;
     @FXML private Label errorLabel;
 
+    private final String defaultStyle = "-fx-border-color: #dcdcdc; -fx-border-radius: 10; -fx-background-radius: 10;";
+    private final String errorStyle = "-fx-border-color: #ff4d4d; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;";
+
     @FXML
     private void handleLogin() {
         String username = usernameField.getText().trim();
@@ -46,10 +49,10 @@ public class LoginController {
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                String dbPassword = rs.getString("password"); // bu hashli haldir
-                String inputHash = PasswordUtil.hashPassword(password); //kullanıcı girişi hashleniyor
+                String dbPassword = rs.getString("password");
+                String inputHash = PasswordUtil.hashPassword(password);
 
-                if (inputHash != null && inputHash.equals(dbPassword)) { // hash eşleşirse giriş başarılı
+                if (inputHash != null && inputHash.equals(dbPassword)) {
                     User user = new User(
                             rs.getInt("id"),
                             rs.getString("username"),
@@ -73,9 +76,8 @@ public class LoginController {
 
     private void showError(String message) {
         errorLabel.setText(message);
-
-        usernameField.setStyle("-fx-border-color: #ff4d4d; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;");
-        passwordField.setStyle("-fx-border-color: #ff4d4d; -fx-border-width: 2; -fx-border-radius: 10; -fx-background-radius: 10;");
+        usernameField.setStyle(errorStyle);
+        passwordField.setStyle(errorStyle);
 
         TranslateTransition tt = new TranslateTransition(Duration.millis(50), loginBox);
         tt.setFromX(0);
@@ -87,8 +89,8 @@ public class LoginController {
 
     private void resetStyles() {
         errorLabel.setText("");
-        usernameField.setStyle("-fx-border-color: #dcdcdc; -fx-border-radius: 10; -fx-background-radius: 10;");
-        passwordField.setStyle("-fx-border-color: #dcdcdc; -fx-border-radius: 10; -fx-background-radius: 10;");
+        usernameField.setStyle(defaultStyle);
+        passwordField.setStyle(defaultStyle);
     }
 
     private void loadDashboard(User user) throws Exception {
@@ -124,9 +126,6 @@ public class LoginController {
             stage.centerOnScreen();
         } catch (Exception e) {
             e.printStackTrace();
-            showError("Register screen could not be opened!");
         }
-
     }
-
 }

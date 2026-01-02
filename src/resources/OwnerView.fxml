@@ -10,21 +10,23 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.OwnerController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="540.0" minWidth="900.0" prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.OwnerController">
    <top>
-      <AnchorPane prefHeight="65.0" prefWidth="1000.0" style="-fx-background-color: #eeeeee; -fx-border-color: #cccccc; -fx-border-width: 0 0 1 0;" BorderPane.alignment="CENTER">
+      <AnchorPane prefHeight="70.0" prefWidth="1000.0" style="-fx-background-color: white; -fx-border-color: #dddddd; -fx-border-width: 0 0 1 0;" BorderPane.alignment="CENTER">
          <children>
-            <ImageView fitHeight="60.0" fitWidth="80.0" layoutX="15.0" layoutY="2.5" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="2.5">
+            <ImageView fitHeight="50.0" fitWidth="70.0" layoutX="20.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="10.0">
                <image>
                   <Image url="@../resources/logo.png" />
                </image>
             </ImageView>
-            <Label alignment="CENTER" layoutX="0.0" layoutY="15.0" prefHeight="35.0" text="Greengrocer Owner Panel" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="15.0">
+            
+            <Label alignment="CENTER" layoutX="150.0" layoutY="18.0" prefHeight="35.0" text="Greengrocer Owner Panel" textFill="#2c3e50" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="150.0" AnchorPane.topAnchor="18.0">
                <font>
                   <Font name="System Bold" size="24.0" />
                </font>
             </Label>
-            <Button layoutX="895.0" layoutY="18.0" mnemonicParsing="false" onAction="#handleLogout" prefHeight="30.0" prefWidth="85.0" style="-fx-background-color: #ff4d4d; -fx-font-weight: bold; -fx-cursor: hand;" text="Logout" textFill="WHITE" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="18.0" />
+            
+            <Button mnemonicParsing="false" onAction="#handleLogout" prefHeight="32.0" prefWidth="90.0" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-cursor: hand;" text="Logout" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="19.0" />
          </children>
       </AnchorPane>
    </top>

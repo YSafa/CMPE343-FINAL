@@ -1,23 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="540.0" prefWidth="960.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.CarrierController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="540.0" minWidth="900.0" prefHeight="540.0" prefWidth="960.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.CarrierController">
    <top>
-      <AnchorPane prefHeight="65.0" prefWidth="960.0" style="-fx-background-color: #eeeeee; -fx-border-color: #cccccc; -fx-border-width: 0 0 1 0;" BorderPane.alignment="CENTER">
+      <AnchorPane prefHeight="70.0" prefWidth="960.0" style="-fx-background-color: white; -fx-border-color: #cccccc; -fx-border-width: 0 0 1 0;" BorderPane.alignment="CENTER">
          <children>
-            <Label layoutX="20.0" layoutY="15.0" text="Carrier Delivery Panel" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="15.0">
+            <ImageView fitHeight="50.0" fitWidth="70.0" layoutX="15.0" layoutY="10.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="15.0">
+               <image>
+                  <Image url="@../resources/logo.png" />
+               </image>
+            </ImageView>
+
+            <Label alignment="CENTER" layoutX="180.0" layoutY="18.0" prefHeight="35.0" text="Carrier Delivery Panel" textFill="#2c3e50" AnchorPane.leftAnchor="180.0" AnchorPane.rightAnchor="180.0">
                <font>
                   <Font name="System Bold" size="24.0" />
                </font>
             </Label>
             
-            <HBox alignment="CENTER_RIGHT" layoutX="600.0" layoutY="15.0" spacing="15.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="15.0">
+            <HBox alignment="CENTER_RIGHT" layoutX="700.0" layoutY="18.0" spacing="12.0" AnchorPane.rightAnchor="20.0">
                <children>
-                  <Button mnemonicParsing="false" onAction="#handleRefresh" prefHeight="30.0" prefWidth="90.0" style="-fx-cursor: hand;" text="Refresh" />
-                  <Button mnemonicParsing="false" onAction="#handleLogout" prefHeight="30.0" prefWidth="90.0" style="-fx-background-color: #ff4d4d; -fx-font-weight: bold; -fx-cursor: hand;" text="Logout" textFill="WHITE" />
+                  <Button mnemonicParsing="false" onAction="#handleRefresh" prefHeight="32.0" prefWidth="90.0" style="-fx-background-radius: 20; -fx-cursor: hand;" text="Refresh" />
+                  <Button mnemonicParsing="false" onAction="#handleLogout" prefHeight="32.0" prefWidth="90.0" style="-fx-background-color: #e74c3c; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-radius: 20;" text="Logout" textFill="WHITE" />
                </children>
             </HBox>
          </children>
@@ -42,9 +50,9 @@
                     </TableView>
                  </center>
                  <bottom>
-                    <HBox alignment="CENTER" spacing="10" style="-fx-padding: 10;">
+                    <HBox alignment="CENTER" spacing="10" style="-fx-padding: 15;">
                        <children>
-                          <Button onAction="#handleClaimSelectedAvailable" prefHeight="35.0" prefWidth="200.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="Claim Selected Order" />
+                          <Button onAction="#handleClaimSelectedAvailable" prefHeight="35.0" prefWidth="200.0" style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand;" text="Claim Selected Order" />
                        </children>
                     </HBox>
                  </bottom>
@@ -55,13 +63,13 @@
             <content>
                <BorderPane>
                   <top>
-                     <HBox alignment="CENTER" spacing="15" style="-fx-padding: 15;">
+                     <HBox alignment="CENTER" spacing="15" style="-fx-padding: 15; -fx-background-color: #f9f9f9;">
                         <children>
-                           <Label text="Delivered Date:" />
+                           <Label text="Delivered Date:" style="-fx-font-weight: bold;" />
                            <DatePicker fx:id="deliveredDatePicker" />
-                           <Label text="Hour:" />
+                           <Label text="Hour:" style="-fx-font-weight: bold;" />
                            <ComboBox fx:id="deliveredHourBox" prefWidth="80" />
-                           <Button onAction="#handleCompleteSelectedOrder" prefHeight="30.0" prefWidth="200.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;" text="Mark as Delivered" />
+                           <Button onAction="#handleCompleteSelectedOrder" prefHeight="30.0" prefWidth="180.0" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand;" text="Mark as Delivered" />
                         </children>
                      </HBox>
                   </top>

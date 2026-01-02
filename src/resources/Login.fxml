@@ -46,7 +46,7 @@
                     </children>
                 </VBox>
 
-                <Button onAction="#handleLogin" prefHeight="50.0" prefWidth="380.0" text="LOGIN" style="-fx-background-color: #2e7d32; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-font-size: 16px; -fx-cursor: hand;" />
+                <Button defaultButton="true" onAction="#handleLogin" prefHeight="50.0" prefWidth="380.0" text="LOGIN" style="-fx-background-color: #2e7d32; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-font-size: 16px; -fx-cursor: hand;" />
 
                 <Button onAction="#handleOpenRegister"
                         prefHeight="45.0"
@@ -61,4 +61,3 @@
         </children>
     </StackPane>
 </HBox>
-
