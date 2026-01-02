@@ -1,5 +1,3 @@
-CREATE DATABASE  IF NOT EXISTS `greengrocerdb` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_turkish_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
-USE `greengrocerdb`;
 -- MySQL dump 10.13  Distrib 8.0.44, for Win64 (x86_64)
 --
 -- Host: localhost    Database: greengrocerdb
@@ -16,6 +14,38 @@ USE `greengrocerdb`;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `messages`
+--
+
+DROP TABLE IF EXISTS `messages`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `messages` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `sender_id` int NOT NULL,
+  `receiver_id` int NOT NULL,
+  `message` text NOT NULL,
+  `sent_at` datetime DEFAULT CURRENT_TIMESTAMP,
+  `is_read` tinyint(1) DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `fk_msg_sender` (`sender_id`),
+  KEY `fk_msg_receiver` (`receiver_id`),
+  CONSTRAINT `fk_msg_receiver` FOREIGN KEY (`receiver_id`) REFERENCES `userinfo` (`id`),
+  CONSTRAINT `fk_msg_sender` FOREIGN KEY (`sender_id`) REFERENCES `userinfo` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `messages`
+--
+
+LOCK TABLES `messages` WRITE;
+/*!40000 ALTER TABLE `messages` DISABLE KEYS */;
+INSERT INTO `messages` VALUES (1,1,3,'sdfsdfsdf','2026-01-02 14:07:51',0),(2,1,3,'fsdfsdfsdf','2026-01-02 14:07:55',0),(3,3,1,'Hello','2026-01-02 14:15:45',0),(4,1,3,'Hi','2026-01-02 14:21:49',0),(5,1,3,'hello','2026-01-02 14:24:47',0),(6,1,3,'hı','2026-01-02 14:37:25',0);
+/*!40000 ALTER TABLE `messages` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `orderinfo`
@@ -117,4 +147,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-01-01 22:14:18
+-- Dump completed on 2026-01-02 14:51:16
