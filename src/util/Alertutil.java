@@ -31,6 +31,10 @@ public class Alertutil {
         showAlert("Information", null, message, AlertType.INFORMATION);
     }
 
+    public static boolean showConfirmation(String title, String content) {
+        return showConfirmation(title, null, content);
+    }
+
     public static boolean showConfirmation(String title, String header, String content) {
         Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle(title);
