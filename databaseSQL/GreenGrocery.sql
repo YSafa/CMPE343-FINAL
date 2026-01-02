@@ -1,3 +1,5 @@
+CREATE DATABASE  IF NOT EXISTS `greengrocerdb` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_turkish_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `greengrocerdb`;
 -- MySQL dump 10.13  Distrib 8.0.44, for Win64 (x86_64)
 --
 -- Host: localhost    Database: greengrocerdb
@@ -38,7 +40,7 @@ CREATE TABLE `carrier_ratings` (
   CONSTRAINT `carrier_ratings_ibfk_2` FOREIGN KEY (`customer_id`) REFERENCES `userinfo` (`id`),
   CONSTRAINT `carrier_ratings_ibfk_3` FOREIGN KEY (`carrier_id`) REFERENCES `userinfo` (`id`),
   CONSTRAINT `carrier_ratings_chk_1` CHECK ((`rating` between 1 and 5))
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -47,8 +49,42 @@ CREATE TABLE `carrier_ratings` (
 
 LOCK TABLES `carrier_ratings` WRITE;
 /*!40000 ALTER TABLE `carrier_ratings` DISABLE KEYS */;
-INSERT INTO `carrier_ratings` VALUES (1,27,1,2,5,'Teslimat hızlıydı.','2026-01-02 12:53:10'),(2,2,1,2,3,'','2026-01-02 13:08:33'),(3,3,1,2,2,'teslimat iyiydi','2026-01-02 13:10:50');
+INSERT INTO `carrier_ratings` VALUES (1,27,1,2,5,'Teslimat hızlıydı.','2026-01-02 12:53:10'),(2,26,1,2,5,'So fast','2026-01-02 16:26:04');
 /*!40000 ALTER TABLE `carrier_ratings` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `couponinfo`
+--
+
+DROP TABLE IF EXISTS `couponinfo`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `couponinfo` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `code` varchar(50) COLLATE utf8mb4_turkish_ci NOT NULL,
+  `discount_rate` double NOT NULL,
+  `expiration_date` timestamp NOT NULL,
+  `min_cart_value` double NOT NULL DEFAULT '50',
+  `is_active` tinyint(1) DEFAULT '1',
+  `user_id` int DEFAULT NULL,
+  `used_date` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `code` (`code`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `couponinfo_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `userinfo` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `couponinfo_chk_1` CHECK (((`discount_rate` > 0) and (`discount_rate` <= 50)))
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_turkish_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `couponinfo`
+--
+
+LOCK TABLES `couponinfo` WRITE;
+/*!40000 ALTER TABLE `couponinfo` DISABLE KEYS */;
+INSERT INTO `couponinfo` VALUES (1,'NEW10',10,'2026-01-12 19:10:40',200,1,NULL,NULL);
+/*!40000 ALTER TABLE `couponinfo` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -70,7 +106,7 @@ CREATE TABLE `messages` (
   KEY `fk_msg_receiver` (`receiver_id`),
   CONSTRAINT `fk_msg_receiver` FOREIGN KEY (`receiver_id`) REFERENCES `userinfo` (`id`),
   CONSTRAINT `fk_msg_sender` FOREIGN KEY (`sender_id`) REFERENCES `userinfo` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -79,7 +115,7 @@ CREATE TABLE `messages` (
 
 LOCK TABLES `messages` WRITE;
 /*!40000 ALTER TABLE `messages` DISABLE KEYS */;
-INSERT INTO `messages` VALUES (1,1,3,'sdfsdfsdf','2026-01-02 14:07:51',0),(2,1,3,'fsdfsdfsdf','2026-01-02 14:07:55',0),(3,3,1,'Hello','2026-01-02 14:15:45',0),(4,1,3,'Hi','2026-01-02 14:21:49',0),(5,1,3,'hello','2026-01-02 14:24:47',0),(6,1,3,'hı','2026-01-02 14:37:25',0),(7,5,3,'sena','2026-01-02 16:17:43',0);
+INSERT INTO `messages` VALUES (1,1,3,'sdfsdfsdf','2026-01-02 14:07:51',0),(2,1,3,'fsdfsdfsdf','2026-01-02 14:07:55',0),(3,3,1,'Hello','2026-01-02 14:15:45',0),(4,1,3,'Hi','2026-01-02 14:21:49',0),(5,1,3,'hello','2026-01-02 14:24:47',0),(6,1,3,'hı','2026-01-02 14:37:25',0);
 /*!40000 ALTER TABLE `messages` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -101,8 +137,9 @@ CREATE TABLE `orderinfo` (
   `totalcost` double DEFAULT NULL,
   `invoice_content` longtext,
   `iscancelled` tinyint(1) DEFAULT '0',
+  `used_coupon_code` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -111,7 +148,7 @@ CREATE TABLE `orderinfo` (
 
 LOCK TABLES `orderinfo` WRITE;
 /*!40000 ALTER TABLE `orderinfo` DISABLE KEYS */;
-INSERT INTO `orderinfo` VALUES (1,'2025-12-20 21:00:41','2025-12-21 21:00:41','2kg Elma, 1kg Domates',1,2,1,95,'Fatura No: 101',0),(2,'2025-12-20 21:00:41','2025-12-21 21:00:41','3kg Patates, 2kg Soğan',1,2,1,105,'Fatura No: 102',0),(3,'2025-12-20 21:00:41','2025-12-31 10:00:00','1kg Muz, 0.5kg Çilek',1,2,1,110,'Fatura No: 103',0),(4,'2025-12-20 21:00:41','2025-12-21 21:00:41','2kg Havuç, 1kg Ispanak',1,2,1,48,'Fatura No: 104',0),(5,'2025-12-20 21:00:41','2025-12-21 21:00:41','4kg Portakal',1,2,1,100,'Fatura No: 105',0),(6,'2025-12-20 21:00:41','2025-12-22 21:00:41','1kg Sarımsak, 2kg Salatalık',1,2,0,170,'Fatura No: 106',0),(7,'2025-12-20 21:00:41','2025-12-21 21:00:41','2kg Patlıcan, 1kg Biber',1,2,1,125,'Fatura No: 107',0),(8,'2025-12-20 21:00:41','2025-12-21 21:00:41','3kg Elma, 2kg Mandalina',1,2,1,130,'Fatura No: 108',0),(9,'2025-12-20 21:00:41','2025-12-22 21:00:41','1kg Kivi, 1kg Ananas',1,2,0,185,'Fatura No: 109',0),(10,'2025-12-20 21:00:41','2025-12-21 21:00:41','2kg Armut, 3kg Patates',1,2,1,130,'Fatura No: 110',0),(11,'2025-12-20 21:00:41','2025-12-21 21:00:41','1kg Brokoli, 1kg Karnabahar',1,2,1,88,'Fatura No: 111',0),(12,'2025-12-20 21:00:41','2025-12-22 21:00:41','5kg Domates',1,2,0,175,'Fatura No: 112',0),(13,'2025-12-20 21:00:41','2025-12-21 21:00:41','2kg Üzüm, 1kg Erik',1,2,1,195,'Fatura No: 113',0),(14,'2025-12-20 21:00:41','2025-12-21 21:00:41','1kg Nar, 2kg Ayva',1,2,1,125,'Fatura No: 114',0),(15,'2025-12-20 21:00:41','2025-12-22 21:00:41','3kg Havuç, 2kg Soğan',1,2,0,84,'Fatura No: 115',0),(16,'2025-12-20 21:00:41','2025-12-21 21:00:41','1kg Çilek, 1kg Muz',1,2,1,155,'Fatura No: 116',0),(17,'2025-12-20 21:00:41','2025-12-21 21:00:41','2kg Pırasa, 1kg Lahana',1,2,1,78,'Fatura No: 117',0),(18,'2025-12-20 21:00:41','2025-12-22 21:00:41','4kg Elma',1,2,0,120,'Fatura No: 118',0),(19,'2025-12-20 21:00:41','2025-12-21 21:00:41','1kg Kivi, 2kg Portakal',1,2,1,125,'Fatura No: 119',0),(20,'2025-12-20 21:00:41','2025-12-21 21:00:41','3kg Salatalık',1,2,1,75,'Fatura No: 120',0),(21,'2025-12-20 21:00:41','2025-12-22 21:00:41','2kg Biber, 1kg Patlıcan',1,2,0,130,'Fatura No: 121',0),(22,'2025-12-20 21:00:41','2025-12-21 21:00:41','1kg Ananas, 0.5kg Çilek',1,2,1,155,'Fatura No: 122',0),(23,'2025-12-20 21:00:41','2025-12-21 21:00:41','2kg Mandalina, 2kg Elma',1,2,1,100,'Fatura No: 123',0),(24,'2025-12-20 21:00:41','2026-01-02 12:00:00','1kg Sarımsak',1,2,1,120,'Fatura No: 124',0),(25,'2025-12-20 21:00:41','2025-12-21 21:00:41','2kg Domates, 1kg Salatalık',1,2,1,95,'Fatura No: 125',0),(26,'2025-12-31 22:51:37','2026-01-01 11:00:00','Banana x 3.0; Carrot x 2.0; Cabbage x 1.0; Cucumber x 7.0; Eggplant x 3.1; Pomegranate x 2.0; Plum x 3.0; Kiwi x 1.0; Tomato x 0.2; ',1,2,1,979,NULL,0),(27,'2026-01-01 10:14:38','2026-01-01 19:00:00','Banana x 2.0; Broccoli x 5.0; ',1,2,1,448.4,NULL,0),(28,'2026-01-01 10:26:59','2026-01-01 11:00:00','Apple x 120.0; ',1,0,0,4248,NULL,1),(29,'2026-01-01 16:53:42','2026-01-01 17:00:00','Cabbage x 2.5; Pineapple x 1.0; Grape x 1.0; ',1,0,0,259.59999999999997,NULL,1),(30,'2026-01-01 19:11:21','2026-01-02 18:00:00','Apple x 3.65; Banana x 5.0; ',1,0,0,512.7099999999999,NULL,1),(31,'2026-01-01 21:21:08','2026-01-01 22:00:00','Apple x 15.35; ',1,0,0,543.39,NULL,1),(32,'2026-01-01 21:28:39','2026-01-01 22:00:00','Carrot x 8.0; Cucumber x 1.5; Grape x 2.0; ',1,0,0,343.96999999999997,NULL,1);
+INSERT INTO `orderinfo` VALUES (1,'2025-12-20 21:00:41','2025-12-21 21:00:41','2kg Elma, 1kg Domates',1,2,1,95,NULL,0,NULL),(2,'2025-12-20 21:00:41','2025-12-21 21:00:41','3kg Patates, 2kg Soğan',1,2,1,105,NULL,0,NULL),(3,'2025-12-20 21:00:41','2025-12-31 10:00:00','1kg Muz, 0.5kg Çilek',1,2,1,110,NULL,0,NULL),(4,'2025-12-20 21:00:41','2025-12-21 21:00:41','2kg Havuç, 1kg Ispanak',1,2,1,48,NULL,0,NULL),(5,'2025-12-20 21:00:41','2025-12-21 21:00:41','4kg Portakal',1,2,1,100,NULL,0,NULL),(6,'2025-12-20 21:00:41','2026-01-03 17:00:00','1kg Sarımsak, 2kg Salatalık',1,2,1,170,NULL,0,NULL),(7,'2025-12-20 21:00:41','2025-12-21 21:00:41','2kg Patlıcan, 1kg Biber',1,2,1,125,NULL,0,NULL),(8,'2025-12-20 21:00:41','2025-12-21 21:00:41','3kg Elma, 2kg Mandalina',1,2,1,130,NULL,0,NULL),(9,'2025-12-20 21:00:41','2025-12-22 21:00:41','1kg Kivi, 1kg Ananas',1,2,0,185,NULL,0,NULL),(10,'2025-12-20 21:00:41','2025-12-21 21:00:41','2kg Armut, 3kg Patates',1,2,1,130,NULL,0,NULL),(11,'2025-12-20 21:00:41','2025-12-21 21:00:41','1kg Brokoli, 1kg Karnabahar',1,2,1,88,NULL,0,NULL),(12,'2025-12-20 21:00:41','2025-12-22 21:00:41','5kg Domates',1,2,0,175,NULL,0,NULL),(13,'2025-12-20 21:00:41','2025-12-21 21:00:41','2kg Üzüm, 1kg Erik',1,2,1,195,NULL,0,NULL),(14,'2025-12-20 21:00:41','2025-12-21 21:00:41','1kg Nar, 2kg Ayva',1,2,1,125,NULL,0,NULL),(15,'2025-12-20 21:00:41','2025-12-22 21:00:41','3kg Havuç, 2kg Soğan',1,2,0,84,NULL,0,NULL),(16,'2025-12-20 21:00:41','2025-12-21 21:00:41','1kg Çilek, 1kg Muz',1,2,1,155,NULL,0,NULL),(17,'2025-12-20 21:00:41','2025-12-21 21:00:41','2kg Pırasa, 1kg Lahana',1,2,1,78,NULL,0,NULL),(18,'2025-12-20 21:00:41','2025-12-22 21:00:41','4kg Elma',1,2,0,120,NULL,0,NULL),(19,'2025-12-20 21:00:41','2025-12-21 21:00:41','1kg Kivi, 2kg Portakal',1,2,1,125,NULL,0,NULL),(20,'2025-12-20 21:00:41','2025-12-21 21:00:41','3kg Salatalık',1,2,1,75,NULL,0,NULL),(21,'2025-12-20 21:00:41','2025-12-22 21:00:41','2kg Biber, 1kg Patlıcan',1,2,0,130,NULL,0,NULL),(22,'2025-12-20 21:00:41','2025-12-21 21:00:41','1kg Ananas, 0.5kg Çilek',1,2,1,155,NULL,0,NULL),(23,'2025-12-20 21:00:41','2025-12-21 21:00:41','2kg Mandalina, 2kg Elma',1,2,1,100,NULL,0,NULL),(24,'2025-12-20 21:00:41','2026-01-02 12:00:00','1kg Sarımsak',1,2,1,120,NULL,0,NULL),(25,'2025-12-20 21:00:41','2025-12-21 21:00:41','2kg Domates, 1kg Salatalık',1,2,1,95,NULL,0,NULL),(26,'2025-12-31 22:51:37','2026-01-01 11:00:00','Banana x 3.0; Carrot x 2.0; Cabbage x 1.0; Cucumber x 7.0; Eggplant x 3.1; Pomegranate x 2.0; Plum x 3.0; Kiwi x 1.0; Tomato x 0.2; ',1,2,1,979,NULL,0,NULL),(27,'2026-01-01 10:14:38','2026-01-01 19:00:00','Banana x 2.0; Broccoli x 5.0; ',1,2,1,448.4,'JVBERi0xLjQKJeLjz9MKNCAwIG9iago8PC9MZW5ndGggNDAxL0ZpbHRlci9GbGF0ZURlY29kZT4+c3RyZWFtCnichVNLb6MwEL77V8ze0kMc22BePeVBI6Sq6WZRT7kgcBt2id0a0se/X2PIQ9lmET7MzPeYGdm8oTdE4QM5HviuBzvEeWijCv1CP0+g59EebKMLkPtuD7ZRB7bwLG3RgHiQFog6HDs+jB3SZpM7CsxEz2i0XMfxAyzXq3m8huThaZXM45v0Nxr3CstnPMA+O6hHYAl90ZYIjKl3cKbUOifyXZW5gGQRWcHkjgFlFmJ+WyDXtStdCA2LrBH/agnzxoSaA5RE1I2cAJMBu4Woynehv4Ydw4gQc7537BY/VRk99nGt03xfN2pnJk/ks9K7rCmVvDTCvBOxw3AHUQRyX1Xf00fTotCirv/LmWdalwM+Qxs8alXs86YenHqWSfPBJzBMbmGmVZ6rqjQ5b/MzOachDt1zj+O1dO+oJ1iyE1LMg7N501U6vYfNqJR5heFpmm5uInDdALuduBccB+1bOOZtnFqQC/xKNd1m8g98qT2Yy4N6q15fS/kCH2WzhaUWQi7NlkL/OBPHqfnV/gLjDuDzCmVuZHN0cmVhbQplbmRvYmoKNiAwIG9iago8PC9UeXBlL1BhZ2UvTWVkaWFCb3hbMCAwIDU5NSA4NDJdL1Jlc291cmNlczw8L0ZvbnQ8PC9GMSAxIDAgUi9GMiAyIDAgUi9GMyAzIDAgUj4+Pj4vQ29udGVudHMgNCAwIFIvUGFyZW50IDUgMCBSPj4KZW5kb2JqCjEgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhLUJvbGQvRW5jb2RpbmcvV2luQW5zaUVuY29kaW5nPj4KZW5kb2JqCjIgMCBvYmoKPDwvVHlwZS9Gb250L1N1YnR5cGUvVHlwZTEvQmFzZUZvbnQvSGVsdmV0aWNhL0VuY29kaW5nL1dpbkFuc2lFbmNvZGluZz4+CmVuZG9iagozIDAgb2JqCjw8L1R5cGUvRm9udC9TdWJ0eXBlL1R5cGUxL0Jhc2VGb250L0hlbHZldGljYS1PYmxpcXVlL0VuY29kaW5nL1dpbkFuc2lFbmNvZGluZz4+CmVuZG9iago1IDAgb2JqCjw8L1R5cGUvUGFnZXMvQ291bnQgMS9LaWRzWzYgMCBSXT4+CmVuZG9iago3IDAgb2JqCjw8L1R5cGUvQ2F0YWxvZy9QYWdlcyA1IDAgUj4+CmVuZG9iago4IDAgb2JqCjw8L1Byb2R1Y2VyKGlUZXh0riA1LjUuMTMuMyCpMjAwMC0yMDIyIGlUZXh0IEdyb3VwIE5WIFwoQUdQTC12ZXJzaW9uXCkpL0NyZWF0aW9uRGF0ZShEOjIwMjYwMTAyMjIwODIxKzAzJzAwJykvTW9kRGF0ZShEOjIwMjYwMTAyMjIwODIxKzAzJzAwJyk+PgplbmRvYmoKeHJlZgowIDkKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwNjEzIDAwMDAwIG4gCjAwMDAwMDA3MDYgMDAwMDAgbiAKMDAwMDAwMDc5NCAwMDAwMCBuIAowMDAwMDAwMDE1IDAwMDAwIG4gCjAwMDAwMDA4OTAgMDAwMDAgbiAKMDAwMDAwMDQ4MyAwMDAwMCBuIAowMDAwMDAwOTQxIDAwMDAwIG4gCjAwMDAwMDA5ODYgMDAwMDAgbiAKdHJhaWxlcgo8PC9TaXplIDkvUm9vdCA3IDAgUi9JbmZvIDggMCBSL0lEIFs8MmMwNjhlYTM5ZGM3MGRiZTBlODhhYWM1YzdlYmVhZDk+PDJjMDY4ZWEzOWRjNzBkYmUwZTg4YWFjNWM3ZWJlYWQ5Pl0+PgolaVRleHQtNS41LjEzLjMKc3RhcnR4cmVmCjExNDYKJSVFT0YK',0,NULL),(28,'2026-01-01 10:26:59','2026-01-01 11:00:00','Apple x 120.0; ',1,0,0,4248,NULL,1,NULL),(29,'2026-01-01 16:53:42','2026-01-01 17:00:00','Cabbage x 2.5; Pineapple x 1.0; Grape x 1.0; ',1,0,0,259.59999999999997,NULL,1,NULL),(30,'2026-01-01 19:11:21','2026-01-02 18:00:00','Apple x 3.65; Banana x 5.0; ',1,0,0,512.7099999999999,NULL,1,NULL),(31,'2026-01-01 21:21:08','2026-01-01 22:00:00','Apple x 15.35; ',1,0,0,543.39,NULL,1,NULL),(32,'2026-01-01 21:28:39','2026-01-01 22:00:00','Carrot x 8.0; Cucumber x 1.5; Grape x 2.0; ',1,0,0,343.96999999999997,NULL,1,NULL),(33,'2026-01-02 19:26:28','2026-01-03 19:00:00','Mandarin x 40.0; ',1,0,0,944,NULL,1,NULL),(34,'2026-01-02 22:13:25','2026-01-03 22:00:00','Mandarin x 40.0; ',1,NULL,0,800,NULL,0,NULL),(35,'2026-01-02 22:13:56','2026-01-03 22:00:00','Orange x 15.0; ',1,NULL,0,375,NULL,0,NULL),(36,'2026-01-02 22:18:46','2026-01-04 22:00:00','Carrot x 8.0; Cucumber x 8.0; ',1,NULL,0,344,NULL,0,NULL);
 /*!40000 ALTER TABLE `orderinfo` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -132,7 +169,7 @@ CREATE TABLE `productinfo` (
   `threshold` double NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_product_name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -161,7 +198,7 @@ CREATE TABLE `userinfo` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `unique_username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -170,7 +207,7 @@ CREATE TABLE `userinfo` (
 
 LOCK TABLES `userinfo` WRITE;
 /*!40000 ALTER TABLE `userinfo` DISABLE KEYS */;
-INSERT INTO `userinfo` VALUES (1,'cust','80d26609c5226268981e4a6d4ceddbc339d991841ae580e3180b56c8ade7651d','customer','Kadir Has Cad. No:1, Istanbul'),(2,'carr','f9356b0952e5681f9bb4969078d6762f1f3f3eb9e87b80d6544103ad918f074c','carrier','Besiktas, Istanbul'),(3,'own','5b3975651c3cab92d044c096dc30a1c2d9525497457472de48c51ecb363d1f4a','owner','Fatih, Istanbul'),(5,'senacoskun','4a1cb623b7491149353febc05c3c509a1cd47ad8e50e183463d37059da386218','customer','incirköy mah.');
+INSERT INTO `userinfo` VALUES (1,'cust','80d26609c5226268981e4a6d4ceddbc339d991841ae580e3180b56c8ade7651d','customer','Kadir Has Cad. No:1, Istanbul'),(2,'carr','f9356b0952e5681f9bb4969078d6762f1f3f3eb9e87b80d6544103ad918f074c','carrier','Besiktas, Istanbul'),(3,'own','5b3975651c3cab92d044c096dc30a1c2d9525497457472de48c51ecb363d1f4a','owner','Fatih, Istanbul');
 /*!40000 ALTER TABLE `userinfo` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -183,4 +220,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-01-02 16:42:45
+-- Dump completed on 2026-01-02 22:29:06
