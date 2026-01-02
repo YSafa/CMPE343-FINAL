@@ -213,16 +213,47 @@ public class CustomerController implements Initializable {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    @FXML private void handleCompletePurchase() {
+    @FXML
+    private void handleCompletePurchase() {
         if (cart.getItems().isEmpty() || cart.getTotalPrice() < MIN_ORDER_AMOUNT || deliveryDatePicker.getValue() == null) {
             Alertutil.showWarningMessage("Check cart amount (min 200TL) and delivery date.");
             return;
         }
-        LocalDateTime dt = LocalDateTime.of(deliveryDatePicker.getValue(), LocalTime.of(deliveryHourBox.getValue(), 0));
-        if (new OrderDAO().placeOrderWithTransaction(currentUser, cart, dt)) {
-            cart.clear(); loadProducts(); Alertutil.showSuccessMessage("Order placed successfully!");
+
+        LocalDateTime dt = LocalDateTime.of(
+                deliveryDatePicker.getValue(),
+                LocalTime.of(deliveryHourBox.getValue(), 0)
+        );
+
+        // Kupon bilgisi alınıyor
+        Coupon usedCoupon = cart.getAppliedCoupon();
+        String usedCouponCode = (usedCoupon != null) ? usedCoupon.getCode() : null;
+
+        // Siparişi ver
+        boolean success = new OrderDAO().placeOrderWithTransaction(currentUser, cart, dt, usedCouponCode);
+
+        if (success) {
+            // Başarılıysa kullanıcıya detaylı bilgi ver
+            StringBuilder message = new StringBuilder("Order placed successfully!");
+
+            if (usedCoupon != null) {
+                message.append("\n\n🎟️ Coupon '")
+                        .append(usedCoupon.getCode())
+                        .append("' applied (")
+                        .append(usedCoupon.getDiscountRate())
+                        .append("% discount).");
+            }
+
+            Alertutil.showSuccessMessage(message.toString());
+
+            cart.clear(); // sepeti temizle
+            loadProducts(); // ürünleri yenile
+        } else {
+            Alertutil.showErrorMessage("Failed to complete the order. Please try again.");
         }
     }
+
+
 
     @FXML private void handleLogout() {
         if (Alertutil.showConfirmation("Logout", "Are you sure you want to log out?")) {
