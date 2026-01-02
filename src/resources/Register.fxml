@@ -2,33 +2,82 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.image.Image?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="controller.RegisterController"
-            prefWidth="400" prefHeight="350">
+<HBox prefHeight="540.0" prefWidth="960.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.RegisterController">
+    <children>
+        <VBox alignment="CENTER" prefWidth="420.0" spacing="25.0" style="-fx-background-color: white;">
+            <children>
+                <ImageView fitHeight="180.0" fitWidth="180.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../resources/logo.png" />
+                    </image>
+                </ImageView>
+                <VBox alignment="CENTER" spacing="10.0">
+                    <children>
+                        <Label text="GREEN GROCER" textFill="#2e7d32">
+                            <font><Font name="System Bold" size="28.0" /></font>
+                        </Label>
+                        <Label text="Freshness and quality delivered to your door." textFill="#666666" wrapText="true" textAlignment="CENTER">
+                            <font><Font name="System Italic" size="14.0" /></font>
+                        </Label>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
 
-    <VBox spacing="12"
-          alignment="CENTER"
-          AnchorPane.topAnchor="30"
-          AnchorPane.leftAnchor="40"
-          AnchorPane.rightAnchor="40"
-          AnchorPane.bottomAnchor="30">
+        <StackPane HBox.hgrow="ALWAYS" style="-fx-background-image: url('/resources/background.png'); -fx-background-size: cover; -fx-background-position: center;">
+            <children>
+                <VBox fx:id="registerBox" alignment="CENTER" maxWidth="400.0" maxHeight="520.0" spacing="15.0" style="-fx-background-color: rgba(255, 255, 255, 0.95); -fx-background-radius: 20; -fx-padding: 30; -fx-border-color: #e0e0e0; -fx-border-radius: 20;">
+                    <effect>
+                        <DropShadow blurType="GAUSSIAN" radius="20.0" color="#00000022"/>
+                    </effect>
+                    <children>
+                        <Label text="Create Account" textFill="#333333">
+                            <font><Font name="System Bold" size="26.0" /></font>
+                        </Label>
 
-        <Label text="Customer Registration"
-               style="-fx-font-size: 18px; -fx-font-weight: bold;" />
+                        <VBox spacing="10.0">
+                            <children>
+                                <VBox spacing="5.0">
+                                    <children>
+                                        <Label text="Username" style="-fx-font-weight: bold;" textFill="#555555" />
+                                        <TextField fx:id="usernameField" prefHeight="40.0" promptText="No symbols, min 4 chars" style="-fx-background-radius: 10; -fx-border-color: #dcdcdc; -fx-border-radius: 10;" />
+                                    </children>
+                                </VBox>
+                                <VBox spacing="5.0">
+                                    <children>
+                                        <Label text="Password" style="-fx-font-weight: bold;" textFill="#555555" />
+                                        <PasswordField fx:id="passwordField" prefHeight="40.0" promptText="No symbols, min 4 chars" style="-fx-background-radius: 10; -fx-border-color: #dcdcdc; -fx-border-radius: 10;" />
+                                    </children>
+                                </VBox>
+                                <VBox spacing="5.0">
+                                    <children>
+                                        <Label text="Confirm Password" style="-fx-font-weight: bold;" textFill="#555555" />
+                                        <PasswordField fx:id="confirmPasswordField" prefHeight="40.0" promptText="Re-enter password" style="-fx-background-radius: 10; -fx-border-color: #dcdcdc; -fx-border-radius: 10;" />
+                                    </children>
+                                </VBox>
+                                <VBox spacing="5.0">
+                                    <children>
+                                        <Label text="Address" style="-fx-font-weight: bold;" textFill="#555555" />
+                                        <TextField fx:id="addressField" prefHeight="40.0" promptText="Full address" style="-fx-background-radius: 10; -fx-border-color: #dcdcdc; -fx-border-radius: 10;" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
 
-        <TextField fx:id="usernameField" promptText="Username" />
-        <PasswordField fx:id="passwordField" promptText="Password" />
-        <TextField fx:id="addressField" promptText="Address" />
-
-        <Button text="Register"
-                onAction="#handleRegister"
-                prefWidth="140"/>
-
-        <Button text="Back to Login"
-                onAction="#handleBack"
-                prefWidth="140"/>
-
-    </VBox>
-
-</AnchorPane>
+                        <Button onAction="#handleRegister" prefHeight="45.0" prefWidth="380.0" text="REGISTER" style="-fx-background-color: #2e7d32; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-font-size: 16px; -fx-cursor: hand;" />
+                        <Button onAction="#handleBack" prefHeight="40.0" prefWidth="380.0" text="BACK TO LOGIN" style="-fx-background-color: transparent; -fx-text-fill: #2e7d32; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;" />
+                        
+                        <Label fx:id="errorLabel" textFill="#ff4d4d" wrapText="true" textAlignment="CENTER">
+                            <font><Font name="System Bold" size="13.0" /></font>
+                        </Label>
+                    </children>
+                </VBox>
+            </children>
+        </StackPane>
+    </children>
+</HBox>

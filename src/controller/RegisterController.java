@@ -5,8 +5,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Control;
 import javafx.stage.Stage;
 import model.User;
 import util.Alertutil;
@@ -22,107 +24,89 @@ public class RegisterController {
     private PasswordField passwordField;
 
     @FXML
+    private PasswordField confirmPasswordField;
+
+    @FXML
     private TextField addressField;
+
+    @FXML
+    private Label errorLabel;
 
     private final UserDAO userDAO = new UserDAO();
 
+    private final String defaultStyle = "-fx-border-color: #dcdcdc; -fx-border-radius: 10; -fx-background-radius: 10;";
+    private final String errorStyle = "-fx-border-color: #ff4d4d; -fx-border-width: 2px; -fx-border-radius: 10; -fx-background-radius: 10;";
+
     @FXML
     private void handleRegister() {
+        resetStyles();
 
         String username = usernameField.getText().trim();
         String password = passwordField.getText();
+        String confirmPassword = confirmPasswordField.getText();
         String address = addressField.getText().trim();
 
-        // Boş alan kontrolü
-        if (username.isEmpty() || password.isEmpty() || address.isEmpty()) {
-            Alertutil.showAlert(
-                    "Error",
-                    null,
-                    "All fields are required.",
-                    Alert.AlertType.ERROR
-            );
+        if (username.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() || address.isEmpty()) {
+            if (username.isEmpty()) markAsError(usernameField);
+            if (password.isEmpty()) markAsError(passwordField);
+            if (confirmPassword.isEmpty()) markAsError(confirmPasswordField);
+            if (address.isEmpty()) markAsError(addressField);
+            errorLabel.setText("All fields are required.");
             return;
         }
 
-        // Username uzunluk kontrolü
-        if (username.length() < 4) {
-            Alertutil.showAlert(
-                    "Invalid Username",
-                    null,
-                    "Username must be at least 4 characters long.",
-                    Alert.AlertType.WARNING
-            );
+        if (username.length() < 4 || !username.matches("[a-zA-Z0-9]+")) {
+            markAsError(usernameField);
+            errorLabel.setText("Username: Min 4 chars, no symbols.");
             return;
         }
 
-        // Şifre minimum uzunluk kontrolü
-        if (password.length() < 4) {
-            Alertutil.showAlert(
-                    "Weak Password",
-                    null,
-                    "Password must be at least 4 characters long.",
-                    Alert.AlertType.WARNING
-            );
+        if (password.length() < 4 || !password.matches("[a-zA-Z0-9]+")) {
+            markAsError(passwordField);
+            errorLabel.setText("Password: Min 4 chars, no symbols.");
             return;
         }
 
-        // Şifreyi hashle (SHA-256)
+        if (!password.equals(confirmPassword)) {
+            markAsError(passwordField);
+            markAsError(confirmPasswordField);
+            errorLabel.setText("Passwords do not match.");
+            return;
+        }
+
         String hashedPassword = PasswordUtil.hashPassword(password);
-
         if (hashedPassword == null) {
-            Alertutil.showAlert(
-                    "Error",
-                    null,
-                    "Password hashing failed. Please try again.",
-                    Alert.AlertType.ERROR
-            );
+            errorLabel.setText("Hashing failed.");
             return;
         }
 
         try {
-            // Yeni kullanıcı nesnesi oluştur
-            User user = new User(
-                    0,
-                    username,
-                    hashedPassword,
-                    "customer",
-                    address
-            );
-
-            boolean success = userDAO.registerCustomer(user);
-
-            if (success) {
-                Alertutil.showAlert(
-                        "Success",
-                        null,
-                        "Registration successful! You can now log in.",
-                        Alert.AlertType.INFORMATION
-                );
+            User user = new User(0, username, hashedPassword, "customer", address);
+            if (userDAO.registerCustomer(user)) {
+                Alertutil.showAlert("Success", null, "Registration successful!", Alert.AlertType.INFORMATION);
                 goBackToLogin();
             }
-
         } catch (SQLException e) {
             String msg = e.getMessage();
-
-            if (msg != null && msg.toLowerCase().contains("duplicate") ||
-                    msg.toLowerCase().contains("unique")) {
-                Alertutil.showAlert(
-                        "Registration Failed",
-                        null,
-                        "Username already exists. Please choose another one.",
-                        Alert.AlertType.ERROR
-                );
+            if (msg != null && (msg.toLowerCase().contains("duplicate") || msg.toLowerCase().contains("unique"))) {
+                markAsError(usernameField);
+                errorLabel.setText("Username already exists.");
             } else {
-                Alertutil.showAlert(
-                        "Database Error",
-                        null,
-                        "An unexpected database error occurred.",
-                        Alert.AlertType.ERROR
-                );
+                errorLabel.setText("Database error occurred.");
             }
-
-            e.printStackTrace();
         }
+    }
+
+    private void markAsError(Control field) {
+        field.setStyle(errorStyle);
+    }
+
+    private void resetStyles() {
+        usernameField.setStyle(defaultStyle);
+        passwordField.setStyle(defaultStyle);
+        confirmPasswordField.setStyle(defaultStyle);
+        addressField.setStyle(defaultStyle);
+        errorLabel.setText("");
     }
 
     @FXML
