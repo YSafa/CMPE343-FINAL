@@ -47,7 +47,13 @@
                 </VBox>
 
                 <Button onAction="#handleLogin" prefHeight="50.0" prefWidth="380.0" text="LOGIN" style="-fx-background-color: #2e7d32; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-font-size: 16px; -fx-cursor: hand;" />
-                
+
+                <Button onAction="#handleOpenRegister"
+                        prefHeight="45.0"
+                        prefWidth="380.0"
+                        text="CREATE ACCOUNT"
+                        style="-fx-background-color: transparent; -fx-text-fill: #2e7d32; -fx-font-weight: bold; -fx-underline: true; -fx-cursor: hand;" />
+
                 <Label fx:id="errorLabel" textFill="#ff4d4d" wrapText="true" textAlignment="CENTER">
                     <font><Font name="System Bold" size="13.0" /></font>
                 </Label>
@@ -55,3 +61,4 @@
         </children>
     </StackPane>
 </HBox>
+

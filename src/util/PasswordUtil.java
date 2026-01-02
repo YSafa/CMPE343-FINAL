@@ -15,6 +15,7 @@ public class PasswordUtil
      */
     public static String hashPassword(String password) {
         try {
+            password = password.trim();
             java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
             byte[] hashBytes = md.digest(password.getBytes("UTF-8"));
 

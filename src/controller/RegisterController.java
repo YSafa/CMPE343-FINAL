@@ -133,7 +133,7 @@ public class RegisterController {
     private void goBackToLogin() {
         try {
             Stage stage = (Stage) usernameField.getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/resources/Login.fxml"));
             stage.setScene(new Scene(loader.load()));
             stage.show();
         } catch (Exception e) {

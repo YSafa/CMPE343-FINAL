@@ -113,4 +113,20 @@ public class LoginController {
         stage.setScene(new Scene(root, 960, 540));
         stage.centerOnScreen();
     }
+
+    @FXML
+    private void handleOpenRegister() {
+        try {
+            Stage stage = (Stage) usernameField.getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/resources/Register.fxml"));
+            Parent root = loader.load();
+            stage.setScene(new Scene(root, 960, 540));
+            stage.centerOnScreen();
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Register screen could not be opened!");
+        }
+
+    }
+
 }
