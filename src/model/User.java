@@ -17,6 +17,24 @@ public class User
         this.role = role;
         this.address = address;
     }
+    private double averageRating;
+    private int ratingCount;
+
+    public double getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(double averageRating) {
+        this.averageRating = averageRating;
+    }
+
+    public int getRatingCount() {
+        return ratingCount;
+    }
+
+    public void setRatingCount(int ratingCount) {
+        this.ratingCount = ratingCount;
+    }
 
     // Getters
     public int getId() { return id; }

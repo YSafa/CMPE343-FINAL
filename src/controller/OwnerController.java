@@ -1,5 +1,6 @@
 package controller;
 
+import dao.RatingDAO;
 import dao.OrderDAO;
 import dao.ProductDAO;
 import dao.UserDAO;
@@ -50,7 +51,8 @@ public class OwnerController {
     @FXML private TableView<User> tableCarriers;
     @FXML private TableColumn<User, Integer> colCarrId;
     @FXML private TableColumn<User, String> colCarrUser, colCarrAddress;
-    
+    @FXML private TableColumn<User, String> colCarrRating;
+
     @FXML private TextField txtCarrierUser, txtCarrierAddress;
     @FXML private PasswordField txtCarrierPass;
 
@@ -68,6 +70,7 @@ public class OwnerController {
     private ProductDAO productDAO = new ProductDAO();
     private UserDAO userDAO = new UserDAO();
     private OrderDAO orderDAO = new OrderDAO();
+    private RatingDAO ratingDAO = new RatingDAO();
 
     @FXML
     public void initialize() {
@@ -90,6 +93,20 @@ public class OwnerController {
         colCarrId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colCarrUser.setCellValueFactory(new PropertyValueFactory<>("username"));
         colCarrAddress.setCellValueFactory(new PropertyValueFactory<>("address"));
+        colCarrRating.setCellValueFactory(cell -> {
+            User carrier = cell.getValue();
+
+            double avg = ratingDAO.getAverageRatingForCarrier(carrier.getId());
+            int count = ratingDAO.getRatingCountForCarrier(carrier.getId());
+
+            if (count == 0) {
+                return new SimpleStringProperty("No ratings");
+            }
+
+            return new SimpleStringProperty(
+                    String.format("⭐ %.1f (%d)", avg, count)
+            );
+        });
 
         // Order Table
         colOrderId.setCellValueFactory(new PropertyValueFactory<>("id"));

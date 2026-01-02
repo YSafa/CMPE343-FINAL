@@ -131,6 +131,7 @@
                             <TableColumn fx:id="colCarrId" prefWidth="60.0" text="ID" />
                             <TableColumn fx:id="colCarrUser" prefWidth="180.0" text="Username" />
                             <TableColumn fx:id="colCarrAddress" prefWidth="350.0" text="Address" />
+                              <TableColumn fx:id="colCarrRating" text="Rating ⭐" prefWidth="140"/>
                           </columns>
                         </TableView>
                      </children>
