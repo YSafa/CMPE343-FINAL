@@ -235,4 +235,34 @@ public class CustomerController implements Initializable {
             }
         }
     }
+    @FXML
+    private void handleMessageOwner() {
+        try {
+            FXMLLoader l = new FXMLLoader(getClass().getResource("/resources/MessageView.fxml"));
+            Stage s = new Stage();
+            s.setScene(new Scene(l.load()));
+
+            User owner = findOwner();
+            ((MessageController) l.getController()).setUsers(currentUser, owner);
+
+            s.setTitle("Message Owner");
+            s.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private User findOwner() throws Exception {
+        String sql = "SELECT * FROM userinfo WHERE role='owner' LIMIT 1";
+        try (var c = DatabaseConnection.getConnection();
+             var ps = c.prepareStatement(sql);
+             var rs = ps.executeQuery()) {
+
+            if (rs.next())
+                return new User(rs.getInt("id"), rs.getString("username"),
+                        null, rs.getString("role"), rs.getString("address"));
+        }
+        throw new RuntimeException("Owner not found");
+    }
+
 }

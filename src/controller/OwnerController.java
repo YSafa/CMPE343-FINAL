@@ -29,6 +29,13 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.Optional;
 
+import database.DatabaseConnection;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import model.User;
+
+
 public class OwnerController {
 
     // --- FXML UI Elements ---
@@ -304,4 +311,68 @@ public class OwnerController {
     private void clearCarrierFields() {
         txtCarrierUser.clear(); txtCarrierPass.clear(); txtCarrierAddress.clear();
     }
+
+    @FXML
+    private void handleOpenMessages() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/resources/MessageView.fxml")
+            );
+            Stage stage = new Stage();
+            stage.setScene(new Scene(loader.load()));
+            stage.setTitle("Customer Messages");
+
+            User owner = getCurrentOwner();
+            User customer = findFirstCustomer();
+
+            ((MessageController) loader.getController())
+                    .setUsers(owner, customer);
+
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private User getCurrentOwner() throws Exception {
+        String sql = "SELECT * FROM userinfo WHERE role='owner' LIMIT 1";
+
+        try (var c = DatabaseConnection.getConnection();
+             var ps = c.prepareStatement(sql);
+             var rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                return new User(
+                        rs.getInt("id"),
+                        rs.getString("username"),
+                        null,
+                        rs.getString("role"),
+                        rs.getString("address")
+                );
+            }
+        }
+        throw new RuntimeException("Owner not found");
+    }
+
+    private User findFirstCustomer() throws Exception {
+        String sql = "SELECT * FROM userinfo WHERE role='customer' LIMIT 1";
+
+        try (var c = DatabaseConnection.getConnection();
+             var ps = c.prepareStatement(sql);
+             var rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                return new User(
+                        rs.getInt("id"),
+                        rs.getString("username"),
+                        null,
+                        rs.getString("role"),
+                        rs.getString("address")
+                );
+            }
+        }
+        throw new RuntimeException("Customer not found");
+    }
+
 }
