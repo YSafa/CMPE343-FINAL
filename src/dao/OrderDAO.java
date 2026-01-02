@@ -21,11 +21,10 @@ public class OrderDAO {
      * @param user The user who makes the order.
      * @param cart The shopping cart of the user.
      * @param deliveryTime The expected delivery time.
-     * @param usedCouponCode The coupon code if the user used one.
      * @return true if the order was placed successfully, false if there was an error.
      */
-    public boolean placeOrderWithTransaction(User user, Cart cart, LocalDateTime deliveryTime, String usedCouponCode) {
-        String insertOrder = "INSERT INTO orderinfo (user_id, total_cost, products, order_time, delivery_time, used_coupon_code) VALUES (?, ?, ?, NOW(), ?, ?)";
+    public boolean placeOrderWithTransaction(User user, Cart cart, LocalDateTime deliveryTime) {
+        String insertOrder = "INSERT INTO orderinfo (user_id, totalcost, products, ordertime, deliverytime) VALUES (?, ?, ?, NOW(), ?)";
         Connection conn = null;
 
         try {
@@ -40,13 +39,8 @@ public class OrderDAO {
             stmt.setDouble(2, total);
             stmt.setString(3, products);
             stmt.setTimestamp(4, Timestamp.valueOf(deliveryTime));
-            stmt.setString(5, usedCouponCode);
             stmt.executeUpdate();
 
-            // Mark coupon as used if available
-            if (usedCouponCode != null && !usedCouponCode.isEmpty()) {
-                new CouponDAO().markAsUsed(usedCouponCode);
-            }
 
             conn.commit();
             return true;
@@ -434,4 +428,27 @@ public class OrderDAO {
 
         return orders;
     }
+
+
+
+    /**
+     * Saves the Base64-encoded invoice into the invoice_content column.
+     *
+     * @param orderId ID of the order
+     * @param base64Invoice Base64 encoded string of the invoice PDF
+     * @return true if update was successful
+     */
+    public boolean saveInvoiceContent(int orderId, String base64Invoice) {
+        String sql = "UPDATE orderinfo SET invoice_content = ? WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, base64Invoice);
+            stmt.setInt(2, orderId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }

@@ -3,40 +3,40 @@ package util;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.draw.LineSeparator;
+import dao.OrderDAO;
 import model.Order;
 
-import java.io.FileOutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.*;
+import java.nio.file.*;
+import java.util.Base64;
 
 /**
- * Utility class for creating invoice files.
- * It generates a PDF invoice for an order.
+ * Utility class for creating and saving invoice files.
+ * It generates a PDF invoice and also stores it as Base64 text (CLOB) in the database.
  */
 public class InvoiceUtil {
 
     /**
      * Creates a PDF invoice for the given order.
-     * The invoice file is saved to disk.
+     * The invoice is saved to disk and stored in the database as Base64 text.
      *
-     * @param order order information
-     * @return path of the created invoice file
-     * @throws Exception if file creation fails
+     * @param order The order information
+     * @param filePath The file name for saving the PDF
+     * @throws Exception if file creation or DB save fails
      */
-    public static Path generateInvoice(Order order) throws Exception {
-
-        // 📁 invoices klasörü
+    public static void generateInvoice(Order order, String filePath) throws Exception {
+        // PDF directory
         Path dir = Paths.get("invoices");
         if (!Files.exists(dir)) {
             Files.createDirectories(dir);
         }
 
-        // 📄 dosya yolu
-        Path filePath = dir.resolve("invoice_" + order.getId() + ".pdf");
+        // Full file path
+        Path pdfPath = dir.resolve(filePath);
 
+        // Create PDF document
         Document document = new Document(PageSize.A4);
-        PdfWriter.getInstance(document, new FileOutputStream(filePath.toFile()));
+        PdfWriter.getInstance(document, new FileOutputStream(pdfPath.toFile()));
         document.open();
 
         // Fonts
@@ -50,10 +50,9 @@ public class InvoiceUtil {
         Paragraph title = new Paragraph("GREEN GROCER INVOICE\n\n", titleFont);
         title.setAlignment(Element.ALIGN_CENTER);
         document.add(title);
-
         document.add(new LineSeparator());
 
-        // Invoice Info
+        // Invoice info
         Paragraph info = new Paragraph();
         info.add(new Chunk("Invoice ID: ", boldFont));
         info.add(order.getId() + "\n");
@@ -63,10 +62,9 @@ public class InvoiceUtil {
         info.add(order.getDeliveryTime() + "\n\n");
         document.add(info);
 
-        // Customer Info
+        // Customer info
         document.add(new Paragraph("Customer Information", sectionFont));
         document.add(new LineSeparator());
-
         document.add(new Paragraph(
                 "Customer: " + order.getCustomerName() + "\n" +
                         "Address: " + order.getCustomerAddress() + "\n" +
@@ -95,6 +93,12 @@ public class InvoiceUtil {
 
         document.close();
 
-        return filePath;
+        // ✅ Convert PDF to Base64 for database
+        byte[] pdfBytes = Files.readAllBytes(pdfPath);
+        String base64Invoice = Base64.getEncoder().encodeToString(pdfBytes);
+
+        // ✅ Save Base64 string into database (CLOB)
+        OrderDAO orderDAO = new OrderDAO();
+        orderDAO.saveInvoiceContent(order.getId(), base64Invoice);
     }
 }

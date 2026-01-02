@@ -376,24 +376,21 @@ public class CustomerController implements Initializable {
                 LocalTime.of(deliveryHourBox.getValue(), 0)
         );
 
-        // Kupon bilgisi alınıyor
-        Coupon usedCoupon = cart.getAppliedCoupon();
-        String usedCouponCode = (usedCoupon != null) ? usedCoupon.getCode() : null;
 
         // Siparişi ver
-        boolean success = new OrderDAO().placeOrderWithTransaction(currentUser, cart, dt, usedCouponCode);
+        boolean success = new OrderDAO().placeOrderWithTransaction(currentUser, cart, dt);
 
         if (success) {
             // Başarılıysa kullanıcıya detaylı bilgi ver
             StringBuilder message = new StringBuilder("Order placed successfully!");
 
-            if (usedCoupon != null) {
+            /*if (usedCoupon != null) {
                 message.append("\n\n Coupon '")
                         .append(usedCoupon.getCode())
                         .append("' applied (")
                         .append(usedCoupon.getDiscountRate())
                         .append("% discount).");
-            }
+            }*/
 
             Alertutil.showSuccessMessage(message.toString());
 
